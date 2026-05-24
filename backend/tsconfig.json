@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",                                  /* Define la versión de JavaScript de salida */
+    "module": "NodeNext",                                /* El estándar moderno para Node.js */
+    "moduleResolution": "NodeNext",
+    "rootDir": "./src",                                  /* Dónde vive tu código fuente TypeScript */
+    "outDir": "./dist",                                  /* Dónde se guardará el JavaScript compilado */
+    "esModuleInterop": true,                             /* Permite importar módulos antiguos de JS sin errores */
+    "forceConsistentCasingInFileNames": true,            /* Evita errores entre Windows y Linux por mayúsculas */
+    "strict": true,                                      /* ACTIVA EL SEGURO DE VIDA: Cero errores de tipos */
+    "skipLibCheck": true                                 /* Acelera la compilación ignorando librerías externas */
+  },
+  "include": ["src/**/*"]                                /* Dile a TS que solo compile lo que está en src/ */
+}
