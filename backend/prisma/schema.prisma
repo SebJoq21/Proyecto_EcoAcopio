@@ -1,0 +1,174 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =============================================================================
+// TABLAS MAESTRAS E INDEPENDIENTES
+// =============================================================================
+
+model Empresa {
+  id_empresa     String   @id @default(uuid()) @db.Uuid
+  razon_social   String   @unique @db.VarChar(100)
+  ruc            String   @unique @db.VarChar(100)
+  direccion      String   @db.VarChar(200)
+  telefono       String   @db.VarChar(20)
+  email          String   @unique @db.VarChar(200)
+  logo_url       String?  @db.Text
+  is_active      Boolean  @default(true)
+  fecha_creacion DateTime @default(now()) @db.Timestamp(6)
+
+  // Relaciones (1 a Muchos)
+  usuarios              Usuario[]
+  categorias_materiales CategoriaMaterial[]
+  materiales            Material[]
+  proveedores           Proveedor[]
+  inventarios           Inventario[]
+  cierres_mensuales     CierreMensual[]
+  pesajes               Pesaje[]
+
+  @@map("empresas")
+}
+
+model Usuario {
+  id_usuario     String   @id @default(uuid()) @db.Uuid
+  id_empresa     String   @db.Uuid
+  nombres        String   @db.VarChar(100)
+  apellidos      String   @db.VarChar(200)
+  email          String   @db.VarChar(200)
+  rol            String   @db.VarChar(20)
+  contrasena     String   @map("contraseña") @db.Text
+  activo         Boolean  @default(true)
+  fecha_creacion DateTime @default(now()) @db.Timestamp(6)
+
+  // Relaciones
+  empresa           Empresa         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  cierres_mensuales CierreMensual[]
+  pesajes           Pesaje[]
+
+  @@unique([id_empresa, email], map: "uq_usuario_empresa_email")
+  @@map("usuarios")
+}
+
+// =============================================================================
+// CATÁLOGOS DE MATERIALES Y PROVEEDORES
+// =============================================================================
+
+model CategoriaMaterial {
+  id_categoria   String   @id @default(uuid()) @db.Uuid
+  id_empresa     String   @db.Uuid
+  nombre         String   @db.VarChar(100)
+  fecha_creacion DateTime @default(now()) @db.Timestamp(6)
+
+  // Relaciones
+  empresa    Empresa    @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  materiales Material[]
+
+  @@map("categorias_materiales")
+}
+
+model Material {
+  id_material           String  @id @default(uuid()) @db.Uuid
+  id_empresa            String  @db.Uuid
+  id_categoria          String  @db.Uuid
+  etiqueta              String  @db.VarChar(20)
+  nombre                String  @db.VarChar(100)
+  precio_referencial_kg Decimal @default(0.00) @db.Decimal(10, 2)
+  activo                Boolean @default(true)
+
+  // Relaciones
+  empresa     Empresa           @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  categoria   CategoriaMaterial @relation(fields: [id_categoria], references: [id_categoria])
+  inventarios Inventario[]
+  pesajes     Pesaje[]
+
+  @@map("materiales")
+}
+
+model Proveedor {
+  id_provider      String   @id @default(uuid()) @db.Uuid
+  id_empresa       String   @db.Uuid
+  nombre_completo  String   @db.VarChar(100)
+  tipo_documento   String?  @db.VarChar(100)
+  numero_documento String?  @db.VarChar(20)
+  telefono         String?  @db.VarChar(20)
+  activo           Boolean  @default(true)
+  es_anonimo       Boolean  @default(false)
+  fecha_creacion   DateTime @default(now()) @db.Timestamp(6)
+
+  // Relaciones
+  empresa Empresa  @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  pesajes Pesaje[]
+
+  @@unique([id_empresa, numero_documento], map: "uq_proveedor_empresa_doc")
+  @@map("proveedores")
+}
+
+// =============================================================================
+// MÓDULOS TRANSACCIONALES
+// =============================================================================
+
+model Inventario {
+  id_inventario        String   @id @default(uuid()) @db.Uuid
+  id_empresa           String   @db.Uuid
+  id_material          String   @db.Uuid
+  stock_kg             Decimal  @default(0.00) @db.Decimal(10, 2)
+  stock_minimo_kg      Decimal  @default(0.00) @db.Decimal(10, 2)
+  ultima_actualizacion DateTime @default(now()) @updatedAt @db.Timestamp(6)
+
+  // Relaciones
+  empresa  Empresa  @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  material Material @relation(fields: [id_material], references: [id_material], onDelete: Cascade)
+
+  @@unique([id_empresa, id_material], map: "uq_inventario_empresa_material")
+  @@map("inventarios")
+}
+
+model CierreMensual {
+  id_cierre             String   @id @default(uuid()) @db.Uuid
+  id_empresa            String   @db.Uuid
+  id_usuario            String   @db.Uuid
+  mes                   Int
+  anio                  Int      @map("año")
+  total_kilos_comprados Decimal  @default(0.00) @db.Decimal(10, 2)
+  total_kilos_vendidos  Decimal  @default(0.00) @db.Decimal(10, 2)
+  inversion_total       Decimal  @default(0.00) @db.Decimal(10, 2)
+  ingreso_total         Decimal  @default(0.00) @db.Decimal(10, 2)
+  fecha_cierre          DateTime @default(now()) @db.Timestamp(6)
+
+  // Relaciones
+  empresa Empresa  @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  usuario Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+  pesajes Pesaje[]
+
+  @@unique([id_empresa, mes, anio], map: "uq_cierre_empresa_periodo")
+  @@map("cierres_mensuales")
+}
+
+model Pesaje {
+  id_pesaje       String   @id @default(uuid()) @db.Uuid
+  id_empresa      String   @db.Uuid
+  id_usuario      String   @db.Uuid
+  id_material     String   @db.Uuid
+  id_proveedor    String   @db.Uuid
+  id_cierre       String?  @db.Uuid
+  tipo_movimiento String   @db.VarChar(20)
+  peso_kg         Decimal  @default(0.00) @db.Decimal(10, 2)
+  precio_unitario Decimal  @default(0.00) @db.Decimal(10, 2)
+  total_pagado    Decimal  @default(0.00) @db.Decimal(10, 2)
+  observaciones   String?  @db.Text
+  estado          String   @default("Completado") @db.VarChar(20)
+  fecha_creacion  DateTime @default(now()) @db.Timestamp(6)
+
+  // Relaciones
+  empresa   Empresa        @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  usuario   Usuario        @relation(fields: [id_usuario], references: [id_usuario])
+  material  Material       @relation(fields: [id_material], references: [id_material])
+  proveedor Proveedor      @relation(fields: [id_proveedor], references: [id_provider])
+  cierre    CierreMensual? @relation(fields: [id_cierre], references: [id_cierre], onDelete: SetNull)
+
+  @@map("pesajes")
+}

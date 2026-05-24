@@ -167,3 +167,11 @@ EcoAcopio/
 |   ├── tsconfig.json           <-- Reglas base de TypeScript
 |   ├── tsconfig.node.json      <-- Reglas TS para el entorno de Vite
 |   └── vite.config.ts          <-- Configuración del bundler Vite
+
+# INICIALIZAR EL BACKEND
+1. Clona el repositorio, navega a la carpeta del backend y ejecuta el instalador de paquetes:
+```bash
+cd backend
+npm install
+
+2. Crea un archivo .env a partir del archivo .env.example y coloca las crendeciales **(CUIDADO CON SUBIR EL ARCHIVO .env)**
