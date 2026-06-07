@@ -1,7 +1,12 @@
 import { Router } from 'express';
 import { proveedorController } from '../controllers/proveedor.controller';
+import { verifyAuth } from '../middlewares/auth.middleware';
+import { verifyTenant } from '../middlewares/tenant.middleware';
 
 const router = Router();
+
+router.use(verifyAuth);
+router.use(verifyTenant);
 
 router.get('/', proveedorController.getAll);
 router.get('/:id', proveedorController.getById);

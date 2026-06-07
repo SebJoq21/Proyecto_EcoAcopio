@@ -1,5 +1,6 @@
 import { usuarioRepository } from '../repositories/usuario.repository';
 import { CreateUsuarioDTO, UpdateUsuarioDTO } from '../types/usuario.dto';
+import { hashPassword } from '../utils/bcrypt.util';
 import prisma from '../config/prisma';
 
 export class UsuarioService {
@@ -26,7 +27,9 @@ export class UsuarioService {
       throw new Error(`El correo ${data.email} ya está registrado en esta empresa.`);
     }
 
-    // (Aquí más adelante agregaremos la encriptación de la contraseña)
+    // 🔐 ENCRIPTACIÓN REAL: Reemplazamos el comentario por el hash de Bcrypt
+    data.contrasena = await hashPassword(data.contrasena);
+
     return await usuarioRepository.create(data);
   }
 

@@ -1,7 +1,12 @@
 import { Router } from 'express';
 import { categoriaController } from '../controllers/categoria.controller';
+import { verifyAuth } from '../middlewares/auth.middleware';
+import { verifyTenant } from '../middlewares/tenant.middleware';
 
 const router = Router();
+
+router.use(verifyAuth);
+router.use(verifyTenant);
 
 router.get('/', categoriaController.getAll);
 router.get('/:id', categoriaController.getById);

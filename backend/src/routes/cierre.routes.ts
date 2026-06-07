@@ -5,7 +5,6 @@ import { verifyTenant } from '../middlewares/tenant.middleware';
 
 const router = Router();
 
-// Protegemos las finanzas con los middlewares
 router.use(verifyAuth);
 router.use(verifyTenant);
 

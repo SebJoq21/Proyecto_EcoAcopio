@@ -1,7 +1,12 @@
 import { Router } from 'express';
 import { empresaController } from '../controllers/empresa.controller';
+import { verifyAuth } from '../middlewares/auth.middleware';
+import { verifyTenant } from '../middlewares/tenant.middleware';
 
 const router = Router();
+
+router.use(verifyAuth);
+router.use(verifyTenant);
 
 // Mapeamos los métodos HTTP a las funciones del controlador
 router.get('/', empresaController.getAll);

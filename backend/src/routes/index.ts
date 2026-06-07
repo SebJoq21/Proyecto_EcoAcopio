@@ -7,6 +7,7 @@ import usuarioRoutes from './usuario.routes';
 import pesajeRoutes from './pesaje.routes';
 import inventarioRoutes from './inventario.routes';
 import cierreRoutes from './cierre.routes';
+import authRoutes from './auth.routes';
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use('/usuarios', usuarioRoutes);
 router.use('/pesajes', pesajeRoutes);
 router.use('/inventario', inventarioRoutes);
 router.use('/cierres', cierreRoutes);
+router.use('/auth', authRoutes);
 
 export default router;
