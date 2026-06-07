@@ -4,6 +4,7 @@ import categoriaRoutes from './categoria.routes';
 import materialRoutes from './material.routes';
 import proveedorRoutes from './proveedor.routes';
 import usuarioRoutes from './usuario.routes'; 
+import pesajeRoutes from './pesaje.routes';
 
 const router = Router();
 
@@ -12,5 +13,6 @@ router.use('/categorias', categoriaRoutes);
 router.use('/materiales', materialRoutes);
 router.use('/proveedores', proveedorRoutes); 
 router.use('/usuarios', usuarioRoutes);
+router.use('/pesajes', pesajeRoutes);
 
 export default router;
