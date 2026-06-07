@@ -1,16 +1,18 @@
-import 'dotenv/config'; // Carga tu archivo .env al instante
 import app from './app';
+import { ENV } from './config/env';
+import { logger } from './config/logger';
 
-const PORT = process.env.PORT || 3000;
+const PORT = ENV.PORT;
 
 const startServer = () => {
   try {
     app.listen(PORT, () => {
-      console.log(`[Servidor] 🟢 Corriendo en http://localhost:${PORT}`);
-      console.log(`[Healthcheck] 🩺 http://localhost:${PORT}/api/v1/health`);
+      // Usamos tu formato con emojis, pero pasados por nuestro logger de colores
+      logger.success(`🟢 Servidor corriendo en http://localhost:${PORT}`);
+      logger.info(`🩺 Healthcheck disponible en http://localhost:${PORT}/api/v1/health`);
     });
   } catch (error) {
-    console.error('[Servidor] 🔴 Error al iniciar:', error);
+    logger.error('🔴 Error crítico al iniciar el servidor:', error);
     process.exit(1); // Detiene el proceso si algo falla gravemente
   }
 };
