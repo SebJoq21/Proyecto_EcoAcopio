@@ -32,7 +32,6 @@ export default function App() {
         setUser(u); setRole(u.rol);
         setApp(a => ({ ...a, role: u.rol }));
         cargarDatos();
-        setPage("dashboard");
       }).catch(() => Api.clearToken());
     }
   }, []);
@@ -65,7 +64,7 @@ export default function App() {
       }));
 
       const provs = (provsData || []).map(p => ({
-        id_proveedor: p.id_proveedor || p.id,            
+        id_proveedor: p.id_proveedor || p.id_provider || p.id,            
         nombre_completo: p.nombre_completo || "Anónimo", 
         numero_documento: p.numero_documento || "—",
         tipo_documento: p.tipo_documento || "—", 
@@ -129,7 +128,7 @@ export default function App() {
 
   return (
     <>
-      {!user && <LoginPage onLogin={handleLogin} />}
+      {!user && <LoginPage onLogin={handleLogin} showToast={showToast} />}
 
       {user && (
         <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
