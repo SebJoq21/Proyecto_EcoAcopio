@@ -15,7 +15,6 @@ export class UsuarioRepository {
         apellidos: true,     // Cambiado aquí
         email: true,
         rol: true,
-        telefono: true,
         fecha_creacion: true
       },
       orderBy: { fecha_creacion: 'desc' }
@@ -33,7 +32,6 @@ export class UsuarioRepository {
         apellidos: true,     // Cambiado aquí
         email: true,
         rol: true,
-        telefono: true,
         activo: true
       }
     });
