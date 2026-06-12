@@ -5,6 +5,7 @@ export class EmpresaRepository {
   // 1. Obtener todas las empresas activas
   async findAll() {
     return await prisma.empresa.findMany({
+      where: { is_active: true },
       orderBy: { fecha_creacion: 'desc' }
     });
   }

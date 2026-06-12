@@ -3,7 +3,7 @@ import 'dotenv/config';
 export const ENV = {
   PORT: process.env.PORT || 3000,
   DATABASE_URL: process.env.DATABASE_URL as string,
-  JWT_SECRET: process.env.JWT_SECRET as string,
+  JWT_SECRET: process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'supersecret_development_key'),
   NODE_ENV: process.env.NODE_ENV || 'development',
 };
 
@@ -13,5 +13,5 @@ if (!ENV.DATABASE_URL) {
 }
 
 if (!ENV.JWT_SECRET) {
-  throw new Error('Falta configurar JWT_SECRET en el archivo .env');
+  throw new Error('Falta configurar JWT_SECRET en el archivo .env en producción');
 }
