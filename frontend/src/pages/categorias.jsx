@@ -95,7 +95,6 @@ export default function CategoriasPage({ showToast }) {
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
                 <thead>
                   <tr style={{ textAlign: "left", borderBottom: "2px solid var(--border)", color: "var(--text2)" }}>
-                    <th style={{ padding: "12px 8px" }}>ID (UUID de Base de Datos)</th>
                     <th style={{ padding: "12px 8px" }}>Nombre de Categoría</th>
                     <th style={{ padding: "12px 8px" }}>Fecha Creación</th>
                   </tr>
@@ -103,9 +102,6 @@ export default function CategoriasPage({ showToast }) {
                 <tbody>
                   {categorias.map((cat) => (
                     <tr key={cat.id_categoria} style={{ borderBottom: "1px solid var(--border)", color: "var(--text1)" }}>
-                      <td style={{ padding: "12px 8px", fontFamily: "monospace", fontSize: 11, color: "var(--text3)" }}>
-                        {cat.id_categoria}
-                      </td>
                       <td style={{ padding: "12px 8px", fontWeight: 600 }}>{cat.nombre}</td>
                       <td style={{ padding: "12px 8px", color: "var(--text3)" }}>
                         {cat.fecha_creacion ? new Date(cat.fecha_creacion).toLocaleDateString() : "—"}

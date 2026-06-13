@@ -3,14 +3,14 @@ import { Api } from "../services/api";
 
 export default function DashboardPage({ app, onNav, showToast }) {
   const [dash, setDash] = useState(null);
-  const [txs, setTxs] = useState([]);
+  const [allTxs, setAllTxs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
     Promise.all([
       Api.dashboard().catch(() => null),
-      Api.pesajes("?limit=8").catch(() => null)
+      Api.pesajes().catch(() => null)
     ]).then(([dashData, pesajesData]) => {
       if (dashData) setDash(dashData);
       
@@ -18,13 +18,27 @@ export default function DashboardPage({ app, onNav, showToast }) {
       const lista = Array.isArray(pesajesData) 
         ? pesajesData 
         : (pesajesData?.items || pesajesData?.data || []);
-      setTxs(lista);
+      setAllTxs(lista);
     }).finally(() => {
       setLoading(false);
     });
   }, []);
 
   const date = new Date().toLocaleDateString("es-PE", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+  
+  const hoyStr = new Date().toDateString();
+  const pesajesHoyArray = allTxs.filter(t => {
+    const tDate = new Date(t.fecha_creacion || t.registrado_en || t.fecha);
+    return tDate.toDateString() === hoyStr;
+  });
+
+  const pesajesHoyCount = pesajesHoyArray.length;
+  const kgHoyVal = pesajesHoyArray.reduce((acc, t) => {
+    const tipoMov = (t.tipo_movimiento || t.tipo || "Entrada").toUpperCase();
+    return acc + (tipoMov === "ENTRADA" || tipoMov === "COMPRA" ? parseFloat(t.peso_kg || 0) : 0);
+  }, 0);
+
+  const txs = allTxs.slice(0, 8);
   
   const mats = app.materiales.filter(m => m.stock_kg > 0).slice(0, 6);
   const totalStock = app.materiales.reduce((s, m) => s + (m.stock_kg || 0), 0);
@@ -42,13 +56,8 @@ export default function DashboardPage({ app, onNav, showToast }) {
         <div className="stat-card">
           <div className="stat-icon">⚖️</div>
           <div className="stat-label">PESAJES HOY</div>
-          {/* Mapea cualquier variante: snake_case, camelCase o fallback directo a los registros del turno */}
           <div className="stat-value text-green">
-            {dash?.pesajes_hoy ?? 
-             dash?.pesajesHoy ?? 
-             dash?.total_pesajes ?? 
-             dash?.totalRegistros ?? 
-             txs.length}
+            {pesajesHoyCount}
           </div>
           <div className="stat-trend stat-neutral">registros</div>
         </div>
@@ -56,15 +65,8 @@ export default function DashboardPage({ app, onNav, showToast }) {
         <div className="stat-card">
           <div className="stat-icon">📦</div>
           <div className="stat-label">KG INGRESADOS HOY</div>
-          {/* Valida todas las variantes de sumatoria acumulada o calcula dinámicamente sobre el flujo activo */}
           <div className="stat-value text-blue">
-            {dash?.kg_hoy ?? dash?.kgHoy ?? dash?.total_kg ?? dash?.totalKg 
-              ? Number(dash?.kg_hoy ?? dash?.kgHoy ?? dash?.total_kg ?? dash?.totalKg).toFixed(1)
-              : Number(txs.reduce((acc, t) => {
-                  const tipoMov = (t.tipo_movimiento || t.tipo || "Entrada").toUpperCase();
-                  return acc + (tipoMov === "ENTRADA" || tipoMov === "COMPRA" ? parseFloat(t.peso_kg || 0) : 0);
-                }, 0)).toFixed(1)
-            }
+            {Number(kgHoyVal).toFixed(1)}
           </div>
           <div className="stat-trend stat-neutral">kg acumulados</div>
         </div>

@@ -7,7 +7,7 @@ const appendEmpresa = (path) => {
     // 🔴 REGLA DE EXCLUSIÓN: Si la ruta es de autenticación, no le inyectamos parámetros de tenant
     if (path.startsWith("/auth")) return path;
 
-    const user = JSON.parse(localStorage.getItem("eco_user"));
+    const user = JSON.parse(sessionStorage.getItem("eco_user"));
     const idEmpresa = user?.id_empresa;
     if (!idEmpresa) return path;
     
@@ -19,14 +19,14 @@ const appendEmpresa = (path) => {
 };
 
 export const Api = {
-  getToken: () => localStorage.getItem("eco_token"),
-  getUser: () => { try { return JSON.parse(localStorage.getItem("eco_user")); } catch { return null; } },
-  setToken: (t, u) => { localStorage.setItem("eco_token", t); localStorage.setItem("eco_user", JSON.stringify(u)); },
-  clearToken: () => { localStorage.removeItem("eco_token"); localStorage.removeItem("eco_user"); },
+  getToken: () => sessionStorage.getItem("eco_token"),
+  getUser: () => { try { return JSON.parse(sessionStorage.getItem("eco_user")); } catch { return null; } },
+  setToken: (t, u) => { sessionStorage.setItem("eco_token", t); sessionStorage.setItem("eco_user", JSON.stringify(u)); },
+  clearToken: () => { sessionStorage.removeItem("eco_token"); sessionStorage.removeItem("eco_user"); },
 
   headers: () => ({
     "Content-Type": "application/json",
-    ...(localStorage.getItem("eco_token") ? { Authorization: `Bearer ${localStorage.getItem("eco_token")}` } : {}),
+    ...(sessionStorage.getItem("eco_token") ? { Authorization: `Bearer ${sessionStorage.getItem("eco_token")}` } : {}),
   }),
 
   req: async (method, path, body) => {

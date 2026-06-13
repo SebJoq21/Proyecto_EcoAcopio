@@ -9,7 +9,6 @@ import LoginPage from "./pages/login";
 import DashboardPage from "./pages/dashboard";
 import PesajePage from "./pages/pesaje";
 import InventarioPage from "./pages/inventario";
-import ScannerPage from "./pages/scanner";
 import CategoriasPage from "./pages/categorias";
 import ProveedoresPage from "./pages/proveedores";
 import ReportesPage from "./pages/reportes";
@@ -102,7 +101,6 @@ export default function App() {
     { id: "dashboard", icon: "📊", label: "Dashboard", section: "Principal" },
     { id: "pesaje", icon: "⚖️", label: "Registro de Pesaje", section: "Principal" },
     { id: "inventario", icon: "📦", label: "Inventario", section: "Principal" },
-    { id: "scanner", icon: "🤖", label: "Escáner IA", section: "Principal" },
     { id: "categorias", icon: "🏷️", label: "Categorías", section: "Gestión", adminOnly: true },
     { id: "proveedores", icon: "👥", label: "Proveedores", section: "Gestión" },
     { id: "reportes", icon: "📋", label: "Reportes", section: "Gestión", adminOnly: true },
@@ -116,7 +114,6 @@ export default function App() {
       case "dashboard": return <DashboardPage {...props} />;
       case "pesaje": return <PesajePage {...props} />;
       case "inventario": return <InventarioPage {...props} />;
-      case "scanner": return <ScannerPage {...props} />;
       case "categorias": return <CategoriasPage showToast={showToast} />;
       case "proveedores": return <ProveedoresPage {...props} />;
       case "reportes": return <ReportesPage {...props} />;
@@ -142,10 +139,7 @@ export default function App() {
             </div>
             <div className="topbar-divider" />
             <span className="topbar-time">{clock}</span>
-            <div className="notif-btn" style={{ marginLeft: "auto" }}>
-              🔔<div className="notif-dot" />
-            </div>
-            <div className="user-badge" onClick={handleLogout} title="Cerrar sesión">
+            <div className="user-badge" onClick={handleLogout} title="Cerrar sesión" style={{ marginLeft: "auto" }}>
               <span style={{ fontSize: 13, color: "var(--text1)" }}>{user.nombre} {user.apellido}</span>
               <span className={`user-role-pill ${isAdmin ? "role-admin" : "role-operario"}`}>{isAdmin ? "Admin" : "Operario"}</span>
               <span style={{ fontSize: 12, color: "var(--text3)", marginLeft: 6 }}>↩</span>
