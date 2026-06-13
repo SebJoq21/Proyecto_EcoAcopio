@@ -173,5 +173,33 @@ EcoAcopio/
 ```bash
 cd backend
 npm install
+```
 
 2. Crea un archivo .env a partir del archivo .env.example y coloca las crendeciales **(CUIDADO CON SUBIR EL ARCHIVO .env)**
+
+---
+
+## Pruebas Automatizadas
+
+El proyecto incluye dos suites de pruebas para asegurar la calidad del código:
+
+### 1. Pruebas Unitarias e Integración (Backend - Jest)
+Verifican el middleware multi-tenant, restricciones de unicidad de empresas y consistencia de materiales.
+* **Comando para ejecutar:**
+  ```bash
+  cd backend
+  npm test
+  ```
+
+### 2. Pruebas de Extremo a Extremo (E2E - Cypress)
+Simulan el flujo completo del usuario real (autenticación, creación de materiales y operaciones de pesaje en balanza sincronizadas con el inventario).
+* **Ejecutar en consola (headless):**
+  ```bash
+  cd frontend
+  npm run cypress:run
+  ```
+* **Ejecutar en modo interactivo:**
+  ```bash
+  cd frontend
+  npm run cypress:open
+  ```

@@ -10,10 +10,14 @@ export const verifyTenant = (req: AuthRequest, res: Response, next: NextFunction
 
   // TRUCO ARQUITECTÓNICO: 
   // Inyectamos el id_empresa de forma obligatoria en las consultas (Query) y en el cuerpo (Body)
-  // De esta forma, nuestros controladores que exigen req.query.id_empresa o req.body.id_empresa 
-  // seguirán funcionando perfectamente sin necesidad de modificarles el código.
   
-  req.query.id_empresa = req.user.id_empresa;
+  const queryModificada = { ...req.query, id_empresa: req.user.id_empresa };
+  Object.defineProperty(req, 'query', {
+    value: queryModificada,
+    writable: true,
+    configurable: true,
+    enumerable: true
+  });
   
   if (req.body && typeof req.body === 'object') {
     req.body.id_empresa = req.user.id_empresa;

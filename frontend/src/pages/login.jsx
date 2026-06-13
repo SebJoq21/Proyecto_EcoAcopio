@@ -48,9 +48,9 @@ export default function LoginPage({ onLogin, showToast }) {
         activo: usuario.activo
       };
 
-      // 4. Guardamos las credenciales en el almacenamiento local
-      localStorage.setItem("eco_token", token);
-      localStorage.setItem("eco_user", JSON.stringify(usuarioHomologado));
+      // 4. Guardamos las credenciales en el almacenamiento de sesión
+      sessionStorage.setItem("eco_token", token);
+      sessionStorage.setItem("eco_user", JSON.stringify(usuarioHomologado));
 
       // 5. Invocamos la función nativa de tu App.jsx para cambiar de pantalla
       if (typeof onLogin === "function") {
