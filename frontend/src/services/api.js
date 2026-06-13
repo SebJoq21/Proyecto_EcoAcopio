@@ -76,6 +76,17 @@ export const Api = {
     return data;
   },
   
+  register: async (data) => {
+    const res = await fetch(`${BASE}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || json.error || "Error al registrar");
+    return json;
+  },
+
   logout: async () => {
     try { await Api.req("POST", "/auth/logout"); } catch (e) { console.error(e); }
     Api.clearToken();

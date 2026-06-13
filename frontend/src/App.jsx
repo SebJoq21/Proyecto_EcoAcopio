@@ -5,7 +5,8 @@ import { Api } from "./services/api";
 import { useToast, ToastContainer } from "./hooks/useToast";
 import { useClock } from "./hooks/useClock";
 
-import LoginPage from "./pages/login";
+import LandingPage from "./pages/landing";
+import AuthPage from "./pages/login";
 import DashboardPage from "./pages/dashboard";
 import PesajePage from "./pages/pesaje";
 import InventarioPage from "./pages/inventario";
@@ -18,7 +19,8 @@ import AuditoriaPage from "./pages/auditoria";
 export default function App() {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
-  const [page, setPage] = useState("dashboard");
+  const [page, setPage] = useState("landing");
+  const [authTab, setAuthTab] = useState("login");
   const [app, setApp] = useState({ materiales: [], proveedores: [], role: null });
   const { toasts, show: showToast } = useToast();
   const clock = useClock();
@@ -30,6 +32,7 @@ export default function App() {
       Api.me().then(() => {
         setUser(u); setRole(u.rol);
         setApp(a => ({ ...a, role: u.rol }));
+        setPage("dashboard");
         cargarDatos();
       }).catch(() => Api.clearToken());
     }
@@ -90,6 +93,16 @@ export default function App() {
     await Api.logout();
     setUser(null); setRole(null);
     setApp({ materiales: [], proveedores: [], role: null });
+    setPage("landing");
+  };
+
+  const handleNavigate = (target, tab) => {
+    if (target === "auth") {
+      setAuthTab(tab || "login");
+      setPage("auth");
+    } else {
+      setPage(target);
+    }
   };
 
   const isAdmin = role === "admin";
@@ -125,7 +138,10 @@ export default function App() {
 
   return (
     <>
-      {!user && <LoginPage onLogin={handleLogin} showToast={showToast} />}
+      {!user && page === "landing" && <LandingPage onNavigate={handleNavigate} />}
+      {!user && page === "auth" && (
+        <AuthPage onLogin={handleLogin} showToast={showToast} onNavigate={handleNavigate} initialTab={authTab} />
+      )}
 
       {user && (
         <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
