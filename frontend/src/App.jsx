@@ -120,7 +120,7 @@ export default function App() {
     { id: "proveedores", icon: "👥", label: "Proveedores", section: "Gestión" },
     { id: "reportes", icon: "📋", label: "Reportes", section: "Gestión", adminOnly: true },
     { id: "materiales", icon: "🏷️", label: "Lista Maestra", section: "Gestión", adminOnly: true },
-    { id: "auditoria", icon: "🔍", label: "Auditoría", section: "Gestión", adminOnly: true, badge: true },
+    { id: "auditoria", icon: "🔍", label: "Auditoría", section: "Gestión", adminOnly: true },
   ];
 
   const renderPage = () => {
