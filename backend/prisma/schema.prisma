@@ -29,6 +29,7 @@ model Empresa {
   inventarios           Inventario[]
   cierres_mensuales     CierreMensual[]
   pesajes               Pesaje[]
+  auditoria             Auditoria[]
 
   @@map("empresas")
 }
@@ -48,6 +49,7 @@ model Usuario {
   empresa           Empresa         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
   cierres_mensuales CierreMensual[]
   pesajes           Pesaje[]
+  auditoria         Auditoria[]
 
   @@unique([id_empresa, email], map: "uq_usuario_empresa_email")
   @@map("usuarios")
@@ -146,6 +148,33 @@ model CierreMensual {
 
   @@unique([id_empresa, mes, anio], map: "uq_cierre_empresa_periodo")
   @@map("cierres_mensuales")
+}
+
+// =============================================================================
+// MÓDULO DE AUDITORÍA (TRAIL)
+// =============================================================================
+
+enum AccionAuditoria {
+  CREAR
+  ACTUALIZAR
+  ELIMINAR
+}
+
+model Auditoria {
+  id_auditoria         String           @id @default(uuid()) @db.Uuid
+  id_empresa           String           @db.Uuid
+  id_usuario           String           @db.Uuid
+  entidad              String           @db.VarChar(100)
+  accion               AccionAuditoria
+  id_registro_afectado String           @db.Uuid
+  valores_anteriores   Json?            @db.Json
+  valores_nuevos       Json?            @db.Json
+  fecha_creacion       DateTime         @default(now()) @db.Timestamp(6)
+
+  empresa Empresa @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@map("auditoria")
 }
 
 model Pesaje {
