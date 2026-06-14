@@ -88,6 +88,7 @@ export const Api = {
   // ✅ REVISADO: Envío limpio para la tabla pesajes
   pesajes: (qs = "") => Api.req("GET", `/pesajes${qs}`),
   registrarPesaje: (body) => Api.req("POST", "/pesajes", body),
+  crearPesaje: (body) => Api.req("POST", "/pesajes", body),
 
   me: () => Api.req("GET", "/auth/me"),
   
