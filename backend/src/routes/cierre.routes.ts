@@ -9,6 +9,7 @@ router.use(verifyAuth);
 router.use(verifyTenant);
 
 router.get('/', cierreController.getAll);
+router.get('/export', cierreController.exportarCSV);
 router.post('/generar', cierreController.generar);
 
 export default router;

@@ -32,6 +32,25 @@ export class CierreRepository {
       data
     });
   }
+
+  // 4. Obtener todos los pesajes completados en un rango de fechas
+  async findPesajesByPeriodo(id_empresa: string, fechaInicio: Date, fechaFin: Date) {
+    return await prisma.pesaje.findMany({
+      where: {
+        id_empresa,
+        estado: 'Completado',
+        fecha_creacion: {
+          gte: fechaInicio,
+          lt: fechaFin
+        }
+      },
+      include: {
+        material: { select: { nombre: true } },
+        proveedor: { select: { nombre_completo: true } }
+      },
+      orderBy: { fecha_creacion: 'asc' }
+    });
+  }
 }
 
 export const cierreRepository = new CierreRepository();

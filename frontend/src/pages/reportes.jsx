@@ -17,6 +17,7 @@ export default function ReportesPage({ app, showToast }) {
       const m = Number(mes);
       const y = Number(year);
       const data = await Api.reporte(m, y);
+      console.log("📊 Reporte API response:", data);
       setResult(data);
     } catch (e) { 
       showToast("error", "❌ " + e.message); 
@@ -25,12 +26,17 @@ export default function ReportesPage({ app, showToast }) {
     }
   };
 
-  const descargarCSV = (e) => {
-    e.preventDefault();
+  const descargarCSV = async () => {
     try {
-      const url = Api.exportarCSV(mes, year);
-      // Abre la descarga de forma controlada en una pestaña independiente
-      window.open(url, "_blank");
+      const blob = await Api.exportarCSV(mes, year);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `reporte-${String(mes).padStart(2, "0")}-${year}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     } catch (e) {
       showToast("error", "❌ No se pudo descargar el archivo de exportación.");
     }
@@ -83,7 +89,7 @@ export default function ReportesPage({ app, showToast }) {
         {result && (
           <div>
             <div className="sep" />
-            {result.stats?.alterado && (
+            {result.alterado && (
               <div className="alert alert-warning mb-16">
                 <span className="alert-icon">⚠️</span>
                 Este reporte contiene transacciones que fueron modificadas post-registro. Verificar auditoría.
@@ -93,20 +99,20 @@ export default function ReportesPage({ app, showToast }) {
             <div className="grid-4 mb-16">
               <div className="stat-card">
                 <div className="stat-label">TOTAL ENTRADAS</div>
-                <div className="stat-value text-green mono">{result.stats?.total_entradas_kg?.toFixed(2) || "0.00"} kg</div>
+                <div className="stat-value text-green mono">{Number(result.total_entradas || 0).toFixed(2)} kg</div>
               </div>
               <div className="stat-card">
                 <div className="stat-label">TOTAL SALIDAS</div>
-                <div className="stat-value text-red mono">{result.stats?.total_salidas_kg?.toFixed(2) || "0.00"} kg</div>
+                <div className="stat-value text-red mono">{Number(result.total_salidas || 0).toFixed(2)} kg</div>
               </div>
               <div className="stat-card">
                 <div className="stat-label">TRANSACCIONES</div>
-                <div className="stat-value mono">{result.stats?.total_transacciones || 0}</div>
+                <div className="stat-value mono">{result.transacciones || 0}</div>
               </div>
               <div className="stat-card">
                 <div className="stat-label">BALANCE NETO</div>
-                <div className={`stat-value mono ${(result.stats?.balance_kg || 0) >= 0 ? "text-green" : "text-red"}`}>
-                  {(result.stats?.balance_kg || 0).toFixed(2)} kg
+                <div className={`stat-value mono ${(result.balance_neto || 0) >= 0 ? "text-green" : "text-red"}`}>
+                  {Number(result.balance_neto || 0).toFixed(2)} kg
                 </div>
               </div>
             </div>
@@ -123,31 +129,32 @@ export default function ReportesPage({ app, showToast }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {(!result.transacciones || result.transacciones.length === 0) ? (
+                  {(!result.detalles || result.detalles.length === 0) ? (
                     <tr>
                       <td colSpan={5} style={{ textAlign: "center", color: "var(--text3)", padding: 24 }}>
                         Sin transacciones en este período
                       </td>
                     </tr>
                   ) : (
-                    (Array.isArray(result.transacciones) ? result.transacciones : (result.transacciones.items || [])).map((t, i) => (
-                      <tr key={i}>
-                        <td className="mono">{new Date(t.registrado_en || t.createdAt).toLocaleDateString("es-PE")}</td>
-                        <td>
-                          {t.emoji || "♻️"} {t.material}
-                          {t.modificado && <span className="badge badge-amber" style={{ marginLeft: 6 }}>⚠ Modificado</span>}
-                        </td>
-                        <td>{t.proveedor}</td>
-                        <td className={`mono ${t.tipo === "entrada" ? "text-green" : "text-red"}`}>
-                          {t.tipo === "entrada" ? "+" : "−"}{parseFloat(t.peso_kg || 0).toFixed(2)}
-                        </td>
-                        <td>
-                          <span className={`badge badge-${t.tipo === "entrada" ? "green" : "red"}`}>
-                            {t.tipo === "entrada" ? "Entrada" : "Salida"}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
+                    result.detalles.map((t, i) => {
+                      const tipo = (t.tipo_movimiento || "").toUpperCase();
+                      const esEntrada = tipo === "COMPRA" || tipo === "ENTRADA";
+                      return (
+                        <tr key={t.id_pesaje || i}>
+                          <td className="mono">{new Date(t.fecha_creacion).toLocaleDateString("es-PE")}</td>
+                          <td>♻️ {t.material?.nombre || "—"}</td>
+                          <td>{t.proveedor?.nombre_completo || "—"}</td>
+                          <td className={`mono ${esEntrada ? "text-green" : "text-red"}`}>
+                            {esEntrada ? "+" : "−"}{Number(t.peso_kg || 0).toFixed(2)}
+                          </td>
+                          <td>
+                            <span className={`badge badge-${esEntrada ? "green" : "red"}`}>
+                              {esEntrada ? "Entrada" : "Salida"}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>

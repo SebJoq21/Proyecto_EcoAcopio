@@ -107,8 +107,19 @@ export const Api = {
     }
   },
   
-  reporte: (mes, year) => Api.req("GET", `/cierres?mes=${mes}&year=${year}`),
-  exportarCSV: (mes, year) => `${BASE}/cierres/export?mes=${mes}&year=${year}&token=${Api.getToken()}`,
+  reporte: (mes, anio) => Api.req("GET", `/cierres?mes=${mes}&anio=${anio}`),
+  exportarCSV: async (mes, anio) => {
+    const path = appendEmpresa(`/cierres/export?mes=${mes}&anio=${anio}`);
+    const res = await fetch(`${BASE}${path}`, {
+      method: "GET",
+      headers: Api.headers(),
+    });
+    if (!res.ok) {
+      const errData = res.headers.get("content-type")?.includes("application/json") ? await res.json() : null;
+      throw new Error(errData?.error || `Error ${res.status} al descargar el CSV`);
+    }
+    return await res.blob();
+  },
   auditoria: (limit = 100) => Api.req("GET", `/auditoria?limit=${limit}`),
   analizarIA: (body) => Api.req("POST", "/scanner/analizar", body),
 };
