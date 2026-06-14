@@ -5,7 +5,7 @@ export class AuditoriaController {
   async getAll(req: Request, res: Response): Promise<void> {
     try {
       // Priorizamos el body o query dependiendo de dónde inyecte la info el middleware
-      const id_empresa = req.body.id_empresa || (req.query.id_empresa as string);
+      const id_empresa = (req.query?.id_empresa as string) || req.body?.id_empresa || (req as any).user?.id_empresa || (req as any).tenant?.id_empresa;
       
       if (!id_empresa) {
         res.status(400).json({ error: 'El id_empresa es obligatorio para acceder al historial.' });
