@@ -1,6 +1,47 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
+  --bg0: #f1f5f9;
+  --bg1: #ffffff;
+  --bg2: #f8fafc;
+  --bg3: #e2e8f0;
+  --bg4: #cbd5e1;
+  --bg5: #94a3b8;
+  --border: #e2e8f0;
+  --border2: #cbd5e1;
+  --text1: #0f172a;
+  --text2: #475569;
+  --text3: #64748b;
+  --green: #22c97a;
+  --green-dim: #1a9a5e;
+  --green-bg: #ecfdf5;
+  --green-border: #a7f3d0;
+  --amber: #f5a623;
+  --amber-dim: #c07d0f;
+  --amber-bg: #fffbeb;
+  --amber-border: #fde68a;
+  --red: #f04e4e;
+  --red-dim: #c03030;
+  --red-bg: #fef2f2;
+  --red-border: #fecaca;
+  --blue: #4e9ef4;
+  --blue-dim: #2a6ec0;
+  --blue-bg: #eff6ff;
+  --blue-border: #bfdbfe;
+  --teal: #2ec4c4;
+  --teal-bg: #f0fdfa;
+  --teal-border: #99f6e4;
+  --accent: #22c97a;
+  --font: 'Space Grotesk', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --r: 10px;
+  --r-sm: 6px;
+  --r-lg: 16px;
+  --shadow: 0 4px 24px rgba(0,0,0,.08);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.05);
+}
+
+:root.dark {
   --bg0: #0a0d0f;
   --bg1: #111518;
   --bg2: #181d21;
@@ -47,6 +88,10 @@ body { display: flex; flex-direction: column; }
 
 /* ===== TOPBAR ===== */
 .topbar { background: var(--bg1); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; height: 58px; flex-shrink: 0; gap: 16px; }
+.theme-toggle { width: 34px; height: 34px; border-radius: var(--r-sm); background: var(--bg2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; transition: background .15s, border-color .15s; flex-shrink: 0; }
+.theme-toggle:hover { background: var(--bg3); border-color: var(--border2); }
+.theme-toggle svg { width: 18px; height: 18px; color: var(--text2); transition: color .15s; }
+.theme-toggle:hover svg { color: var(--text1); }
 .logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .logo-icon { width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, var(--green-bg) 0%, #0f3d27 100%); border: 1px solid var(--green-border); display: flex; align-items: center; justify-content: center; font-size: 17px; }
 .logo-text { font-size: 16px; font-weight: 700; letter-spacing: -.3px; color: var(--text1); }
@@ -56,7 +101,10 @@ body { display: flex; flex-direction: column; }
 .user-role-pill { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; letter-spacing: .5px; text-transform: uppercase; }
 .role-admin { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
 .role-operario { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
-.topbar-time { font-family: var(--mono); font-size: 12px; color: var(--text3); }
+.topbar-clock { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.topbar-date { font-size: 12px; color: var(--text3); white-space: nowrap; }
+.topbar-time { font-family: var(--mono); font-size: 12px; color: var(--text3); white-space: nowrap; }
+.topbar-sep { color: var(--border2); font-size: 12px; }
 .notif-btn { position: relative; width: 34px; height: 34px; border-radius: var(--r-sm); background: var(--bg2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; transition: background .15s; }
 .notif-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--red); border: 1.5px solid var(--bg1); }
 

@@ -2,24 +2,17 @@ import { useState, useEffect } from "react";
 import { Api } from "../services/api";
 
 export default function DashboardPage({ app, onNav, showToast }) {
-  const [dash, setDash] = useState(null);
   const [allTxs, setAllTxs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([
-      Api.dashboard().catch(() => null),
-      Api.pesajes().catch(() => null)
-    ]).then(([dashData, pesajesData]) => {
-      if (dashData) setDash(dashData);
-      
-      // Extraemos el array nativo de forma segura
+    Api.pesajes().then((pesajesData) => {
       const lista = Array.isArray(pesajesData) 
         ? pesajesData 
         : (pesajesData?.items || pesajesData?.data || []);
       setAllTxs(lista);
-    }).finally(() => {
+    }).catch(() => null).finally(() => {
       setLoading(false);
     });
   }, []);
@@ -42,8 +35,6 @@ export default function DashboardPage({ app, onNav, showToast }) {
   
   const mats = app.materiales.filter(m => m.stock_kg > 0).slice(0, 6);
   const totalStock = app.materiales.reduce((s, m) => s + (m.stock_kg || 0), 0);
-  const chartData = app.materiales.filter(m => m.stock_kg > 0).slice(0, 7);
-  const maxKg = Math.max(...chartData.map(m => m.stock_kg), 1);
 
   return (
     <div className="page">
@@ -86,116 +77,87 @@ export default function DashboardPage({ app, onNav, showToast }) {
         </div>
       </div>
 
-      <div className="grid-21 mb-16">
-        <div className="card">
-          <div className="flex-between mb-16">
-            <span className="card-title" style={{ marginBottom: 0 }}>Últimos Registros</span>
-            <button className="btn btn-ghost btn-sm" onClick={() => onNav("pesaje")}>+ Nuevo</button>
-          </div>
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Material</th>
-                  <th>Proveedor</th>
-                  <th>Peso</th>
-                  <th>Hora</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {txs.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} style={{ textAlign: "center", color: "var(--text3)", padding: 24 }}>
-                      {loading ? "Sincronizando..." : "Sin registros aún"}
-                    </td>
-                  </tr>
-                ) : (
-                  txs.map((t, idx) => {
-                    if (!t) return null;
-
-                    // Extracción segura del proveedor (si viene como objeto o string)
-                    let nombreProveedor = "Anónimo";
-                    if (t.proveedor) {
-                      nombreProveedor = typeof t.proveedor === "object" 
-                        ? (t.proveedor.nombre_completo || "Anónimo") 
-                        : String(t.proveedor);
-                    } else if (t.proveedores) {
-                      nombreProveedor = t.proveedores.nombre_completo || "Anónimo";
-                    }
-
-                    // Extracción segura del material
-                    let nombreMaterial = "Material Desconocido";
-                    let emojiMaterial = "♻️";
-                    if (t.material) {
-                      if (typeof t.material === "object") {
-                        nombreMaterial = t.material.nombre || "Material Desconocido";
-                        emojiMaterial = t.material.emoji || "♻️";
-                      } else {
-                        nombreMaterial = String(t.material);
-                      }
-                    } else if (t.materiales) {
-                      nombreMaterial = t.materiales.nombre || "Material Desconocido";
-                      emojiMaterial = t.materiales.emoji || "♻️";
-                    }
-
-                    // Identificación del tipo de movimiento ('Entrada' / 'Salida')
-                    const tipoMov = (t.tipo_movimiento || t.tipo || "Entrada").toUpperCase();
-                    const esEntrada = tipoMov === "ENTRADA" || tipoMov === "COMPRA";
-                    const horaFecha = t.fecha_creacion || t.registrado_en || new Date();
-
-                    return (
-                      <tr key={t.id_pesaje || t.id || `row-${idx}`}>
-                        <td>
-                          <span className="main-cell">{emojiMaterial} {nombreMaterial}</span>
-                        </td>
-                        <td>{nombreProveedor}</td>
-                        <td className="mono" style={{ color: esEntrada ? "var(--green)" : "var(--red)" }}>
-                          {esEntrada ? "+" : "−"}{parseFloat(t.peso_kg || 0).toFixed(2)} kg
-                        </td>
-                        <td className="mono" style={{ fontSize: 12 }}>
-                          {new Date(horaFecha).toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}
-                        </td>
-                        <td>
-                          <span className={`badge badge-${esEntrada ? "green" : "red"}`}>
-                            {esEntrada ? "Entrada" : "Salida"}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+      <div className="card mb-16">
+        <div className="flex-between mb-16">
+          <span className="card-title" style={{ marginBottom: 0 }}>Últimos Registros</span>
+          <button className="btn btn-ghost btn-sm" onClick={() => onNav("pesaje")}>+ Nuevo</button>
         </div>
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Material</th>
+                <th>Proveedor</th>
+                <th>Peso</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {txs.length === 0 ? (
+                <tr>
+                  <td colSpan={6} style={{ textAlign: "center", color: "var(--text3)", padding: 24 }}>
+                    {loading ? "Sincronizando..." : "Sin registros aún"}
+                  </td>
+                </tr>
+              ) : (
+                txs.map((t, idx) => {
+                  if (!t) return null;
 
-        <div className="card">
-          <div className="card-title">Stock por Material</div>
-          <div className="chart-container">
-            {chartData.length === 0 ? (
-              <p style={{ fontSize: 13, color: "var(--text3)", margin: "auto" }}>Sin datos</p>
-            ) : (
-              chartData.map((m, i) => {
-                const pct = (m.stock_kg / maxKg) * 100;
-                const colors = ["var(--green)", "var(--blue)", "var(--amber)", "var(--teal)", "var(--red)"];
-                return (
-                  <div className="chart-bar-wrap" key={m.id_material || m.id || `bar-${i}`}>
-                    <div className="chart-bar-val">{m.stock_kg.toFixed(0)}</div>
-                    <div style={{ flex: 1, display: "flex", alignItems: "flex-end", width: "100%" }}>
-                      <div className="chart-bar" style={{ height: `${pct}%`, background: colors[i % colors.length], width: "100%" }} />
-                    </div>
-                    <div className="chart-bar-label" title={m.nombre}>{m.emoji || "♻️"}</div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-          <div className="sep" />
-          <div className="card-title">Alertas del Sistema</div>
-          <div className="alert alert-info">
-            <span className="alert-icon">ℹ️</span>Sistema iniciado correctamente. Todos los módulos operativos.
-          </div>
+                  let nombreProveedor = "Anónimo";
+                  if (t.proveedor) {
+                    nombreProveedor = typeof t.proveedor === "object" 
+                      ? (t.proveedor.nombre_completo || "Anónimo") 
+                      : String(t.proveedor);
+                  } else if (t.proveedores) {
+                    nombreProveedor = t.proveedores.nombre_completo || "Anónimo";
+                  }
+
+                  let nombreMaterial = "Material Desconocido";
+                  let emojiMaterial = "♻️";
+                  if (t.material) {
+                    if (typeof t.material === "object") {
+                      nombreMaterial = t.material.nombre || "Material Desconocido";
+                      emojiMaterial = t.material.emoji || "♻️";
+                    } else {
+                      nombreMaterial = String(t.material);
+                    }
+                  } else if (t.materiales) {
+                    nombreMaterial = t.materiales.nombre || "Material Desconocido";
+                    emojiMaterial = t.materiales.emoji || "♻️";
+                  }
+
+                  const tipoMov = (t.tipo_movimiento || t.tipo || "Entrada").toUpperCase();
+                  const esEntrada = tipoMov === "ENTRADA" || tipoMov === "COMPRA";
+                  const horaFecha = t.fecha_creacion || t.registrado_en || new Date();
+
+                  return (
+                    <tr key={t.id_pesaje || t.id || `row-${idx}`}>
+                      <td>
+                        <span className="main-cell">{emojiMaterial} {nombreMaterial}</span>
+                      </td>
+                      <td>{nombreProveedor}</td>
+                      <td className="mono" style={{ color: esEntrada ? "var(--green)" : "var(--red)" }}>
+                        {esEntrada ? "+" : "−"}{parseFloat(t.peso_kg || 0).toFixed(2)} kg
+                      </td>
+                      <td className="mono" style={{ fontSize: 12 }}>
+                        {new Date(horaFecha).toLocaleDateString("es-PE", { day: "2-digit", month: "short", year: "numeric" }).replace(".", "")}
+                      </td>
+                      <td className="mono" style={{ fontSize: 12 }}>
+                        {new Date(horaFecha).toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}
+                      </td>
+                      <td>
+                        <span className={`badge badge-${esEntrada ? "green" : "red"}`}>
+                          {esEntrada ? "Entrada" : "Salida"}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 

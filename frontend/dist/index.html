@@ -4,8 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EcoAcopio - Gestión de Centros de Acopio</title>
-    <script type="module" crossorigin src="/assets/index-BdQm1H57.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CCu0DNdk.css">
+    <script>
+      (function() {
+        var t = localStorage.getItem("ecoa-theme");
+        if (t === "dark" || (!t && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-D4INMzcC.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CLM3TSDr.css">
   </head>
   <body>
     <div id="root"></div>

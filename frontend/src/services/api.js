@@ -107,8 +107,8 @@ export const Api = {
     }
   },
   
-  reporte: (mes, year) => Api.req("GET", `/reportes?mes=${mes}&year=${year}`),
-  exportarCSV: (mes, year) => `${BASE}/reportes/export?mes=${mes}&year=${year}&token=${Api.getToken()}`,
+  reporte: (mes, year) => Api.req("GET", `/cierres?mes=${mes}&year=${year}`),
+  exportarCSV: (mes, year) => `${BASE}/cierres/export?mes=${mes}&year=${year}&token=${Api.getToken()}`,
   auditoria: (limit = 100) => Api.req("GET", `/auditoria?limit=${limit}`),
   analizarIA: (body) => Api.req("POST", "/scanner/analizar", body),
 };

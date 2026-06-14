@@ -9,11 +9,14 @@ export default function ReportesPage({ app, showToast }) {
   const [loading, setLoading] = useState(false);
 
   const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const mesNum = { "Enero": 1, "Febrero": 2, "Marzo": 3, "Abril": 4, "Mayo": 5, "Junio": 6, "Julio": 7, "Agosto": 8, "Septiembre": 9, "Octubre": 10, "Noviembre": 11, "Diciembre": 12 };
 
   const generar = async () => {
     setLoading(true);
     try {
-      const data = await Api.reporte(mes, year);
+      const m = Number(mes);
+      const y = Number(year);
+      const data = await Api.reporte(m, y);
       setResult(data);
     } catch (e) { 
       showToast("error", "❌ " + e.message); 

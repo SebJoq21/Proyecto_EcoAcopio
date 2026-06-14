@@ -1,12 +1,21 @@
 import { useState, useEffect } from "react";
 
+function fmt() {
+  const now = new Date();
+  const date = now.toLocaleDateString("es-PE", {
+    day: "numeric", month: "short", year: "numeric"
+  }).replace(".", "");
+  const time = now.toLocaleTimeString("es-PE");
+  return { date, time };
+}
+
 export function useClock() {
-  const [time, setTime] = useState(new Date().toLocaleTimeString("es-PE"));
-  
+  const [clock, setClock] = useState(fmt);
+
   useEffect(() => {
-    const iv = setInterval(() => setTime(new Date().toLocaleTimeString("es-PE")), 1000);
+    const iv = setInterval(() => setClock(fmt()), 1000);
     return () => clearInterval(iv);
   }, []);
-  
-  return time;
+
+  return clock;
 }
