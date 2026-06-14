@@ -944,7 +944,7 @@ tbody td .main-cell { color: var(--text1); font-weight: 500; }
   padding: 32px;
   display: flex;
   flex-direction: column;
-  max-height: 80vh;
+  max-height: 90vh;
 }
 .auth-tabs,
 .auth-error,
@@ -954,10 +954,56 @@ tbody td .main-cell { color: var(--text1); font-weight: 500; }
 }
 .auth-form-scroll {
   flex: 1;
-  overflow-y: auto;
   min-height: 0;
-  padding-bottom: 16px;
+  overflow-y: auto;
+  padding-bottom: 24px;
   padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+.auth-form-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.auth-form-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.auth-form-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+.auth-form-register {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.auth-form-fields {
+  flex: 1;
+  min-height: 0;
+  padding-right: 4px;
+}
+.auth-form-fields--scroll {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+.auth-form-fields--scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.auth-form-fields--scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.auth-form-fields--scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+.auth-form-fields--static {
+  overflow: visible;
+}
+.auth-form-footer {
+  flex-shrink: 0;
+  margin-top: auto;
+  padding-top: 16px;
 }
 .auth-close-btn {
   position: absolute;
@@ -989,6 +1035,9 @@ tbody td .main-cell { color: var(--text1); font-weight: 500; }
   margin-bottom: 6px;
   display: block;
 }
+.auth-form-wrap .form-label.text-red-500 {
+  color: #ef4444;
+}
 .auth-form-wrap .form-input,
 .auth-form-wrap .form-select,
 .auth-form-wrap .form-textarea {
@@ -1018,6 +1067,18 @@ tbody td .main-cell { color: var(--text1); font-weight: 500; }
 .auth-form-wrap .form-select.error {
   border-color: #dc2626;
   box-shadow: 0 0 0 3px rgba(220,38,38,.12);
+}
+.auth-form-wrap .form-input.border-red-500,
+.auth-form-wrap .form-select.border-red-500 {
+  border-color: #ef4444;
+}
+.auth-form-wrap .form-input.focus\:border-red-500:focus,
+.auth-form-wrap .form-select.focus\:border-red-500:focus {
+  border-color: #ef4444;
+}
+.auth-form-wrap .form-input.focus\:ring-red-200:focus,
+.auth-form-wrap .form-select.focus\:ring-red-200:focus {
+  box-shadow: 0 0 0 3px rgba(254, 202, 202, 0.3);
 }
 .auth-tabs {
   display: flex;
@@ -1056,6 +1117,7 @@ tbody td .main-cell { color: var(--text1); font-weight: 500; }
 .auth-steps {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   margin-bottom: 20px;
 }
