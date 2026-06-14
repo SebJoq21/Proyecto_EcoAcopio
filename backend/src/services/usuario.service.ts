@@ -34,7 +34,10 @@ export class UsuarioService {
   }
 
   async updateUsuario(id: string, data: UpdateUsuarioDTO) {
-    await this.getUsuarioById(id); // Verificamos que exista
+    await this.getUsuarioById(id);
+    if (data.contrasena) {
+      data.contrasena = await hashPassword(data.contrasena);
+    }
     return await usuarioRepository.update(id, data);
   }
 

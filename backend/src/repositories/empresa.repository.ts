@@ -1,5 +1,6 @@
 import prisma from '../config/prisma';
 import { CreateEmpresaDTO, UpdateEmpresaDTO } from '../types/empresa.dto';
+import { hashPassword } from '../utils/bcrypt.util';
 
 export class EmpresaRepository {
   // 1. Obtener todas las empresas activas
@@ -17,10 +18,23 @@ export class EmpresaRepository {
     });
   }
 
-  // 3. Crear una nueva empresa
+  // 3. Crear una nueva empresa con su administrador
   async create(data: CreateEmpresaDTO) {
+    const { usuario, ...empresaData } = data;
+    const contrasenaHash = await hashPassword(usuario.password);
     return await prisma.empresa.create({
-      data
+      data: {
+        ...empresaData,
+        usuarios: {
+          create: {
+            nombres: usuario.nombres,
+            apellidos: usuario.apellidos,
+            email: usuario.email,
+            contrasena: contrasenaHash,
+            rol: "admin"
+          }
+        }
+      }
     });
   }
 

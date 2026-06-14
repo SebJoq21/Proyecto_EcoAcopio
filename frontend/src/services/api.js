@@ -60,42 +60,20 @@ export const Api = {
   },
 
   login: async (credenciales) => {
-    const res = await fetch(`${BASE}/auth/login`, {
-      method: "POST", 
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(credenciales),
-    });
-    const data = await res.json();
-    
-    if (!res.ok) {
-      throw new Error(data.message || data.error || data.detail || "Credenciales incorrectas");
-    }
-    
+    const data = await Api.req("POST", "/auth/login", credenciales);
     const token = data.accessToken || data.token || data.access_token;
     Api.setToken(token, data.usuario || data.user);
     return data;
   },
-  
+
   register: async (data) => {
-    const res = await fetch(`${BASE}/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.message || json.error || "Error al registrar");
-    return json;
+    return await Api.req("POST", "/empresas", data);
   },
 
   logout: async () => {
     try { await Api.req("POST", "/auth/logout"); } catch (e) { console.error(e); }
     Api.clearToken();
   },
-
-  
-
-
-
 
   // ✅ NUEVO: Endpoints para enlazar con la tabla categorias_materiales
   categorias: () => Api.req("GET", "/categorias"),
@@ -110,17 +88,6 @@ export const Api = {
   // ✅ REVISADO: Envío limpio para la tabla pesajes
   pesajes: (qs = "") => Api.req("GET", `/pesajes${qs}`),
   registrarPesaje: (body) => Api.req("POST", "/pesajes", body),
-
-  categorias: () => Api.req("GET", "/categorias"),
-  crearCategoria: (body) => Api.req("POST", "/categorias", body),
-
-  materiales: (soloActivos = true) => Api.req("GET", `/materiales${soloActivos ? "?activos=true" : ""}`),
-  crearMaterial: (body) => Api.req("POST", "/materiales", body),
-
-  crearPesaje: (body) => Api.req("POST", "/pesajes", body),
-
-
-
 
   me: () => Api.req("GET", "/auth/me"),
   

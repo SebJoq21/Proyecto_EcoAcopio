@@ -4,10 +4,10 @@ import { verifyAuth } from '../middlewares/auth.middleware';
 
 const router = Router();
 
-// POST /api/v1/auth/login
+// 🟢 PÚBLICA: Cualquier usuario puede intentar iniciar sesión
 router.post('/login', authController.login);
 
-// GET /api/v1/auth/me
+// 🔴 PROTEGIDA: Solo usuarios logueados pueden pedir sus datos
 router.get('/me', verifyAuth, authController.getMe);
 
 export default router;

@@ -5,14 +5,11 @@ import { verifyTenant } from '../middlewares/tenant.middleware';
 
 const router = Router();
 
-router.use(verifyAuth);
-router.use(verifyTenant);
-
-// Rutas base para /api/v1/usuarios
-router.get('/', usuarioController.getAll);
-router.get('/:id', usuarioController.getById);
-router.post('/', usuarioController.create);
-router.put('/:id', usuarioController.update);
-router.delete('/:id', usuarioController.delete);
+// 🔴 PROTEGIDAS: Solo un administrador logueado puede gestionar operarios
+router.get('/', verifyAuth, verifyTenant, usuarioController.getAll);
+router.get('/:id', verifyAuth, verifyTenant, usuarioController.getById);
+router.post('/', verifyAuth, verifyTenant, usuarioController.create);
+router.put('/:id', verifyAuth, verifyTenant, usuarioController.update);
+router.delete('/:id', verifyAuth, verifyTenant, usuarioController.delete);
 
 export default router;
