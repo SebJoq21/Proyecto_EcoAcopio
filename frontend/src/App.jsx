@@ -16,6 +16,7 @@ import ProveedoresPage from "./pages/proveedores";
 import ReportesPage from "./pages/reportes";
 import MaterialesPage from "./pages/materiales";
 import AuditoriaPage from "./pages/auditoria";
+import ConfiguracionPage from "./pages/configuracion";
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -49,7 +50,8 @@ export default function App() {
       ]);
       
       const inv = {};
-      (invData.items || invData || []).forEach(i => { 
+      // Blindado: Optional Chaining (?.) por si invData viene nulo del backend
+      (invData?.items || invData || []).forEach(i => { 
         const idMat = i.id_material || i.id;
         inv[idMat] = parseFloat(i.stock_kg || i.cantidad || 0); 
       });
@@ -107,9 +109,10 @@ export default function App() {
     }
   };
 
-  const isAdmin = role === "admin";
+  // SEGURIDAD: Convertimos a String y Mayúsculas de forma infalible
+  const isAdmin = user?.rol ? String(user.rol).toUpperCase() === 'ADMIN' : false;
+  const isConfigPage = page === "configuracion";
   
-  // 🛡️ SOLUCIÓN EVITAR PANTALLA NEGRA: Forzar transformación estricta a Number
   const totalStock = (app.materiales || []).reduce((s, m) => s + Number(m.stock_kg || 0), 0);
 
   const navItems = [
@@ -134,6 +137,7 @@ export default function App() {
       case "reportes": return <ReportesPage {...props} />;
       case "materiales": return <MaterialesPage {...props} />;
       case "auditoria": return <AuditoriaPage {...props} />;
+      case "configuracion": return <ConfiguracionPage {...props} />;
       default: return null;
     }
   };
@@ -180,41 +184,57 @@ export default function App() {
                 </svg>
               )}
             </button>
-            <div className="user-badge" onClick={handleLogout} title="Cerrar sesión" style={{ marginLeft: "auto" }}>
-              <span style={{ fontSize: 13, color: "var(--text1)" }}>{user.nombre} {user.apellido}</span>
-              <span className={`user-role-pill ${isAdmin ? "role-admin" : "role-operario"}`}>{isAdmin ? "Admin" : "Operario"}</span>
-              <span style={{ fontSize: 12, color: "var(--text3)", marginLeft: 6 }}>↩</span>
+            
+            {/* CORRECCIÓN UX: El badge se muestra para todos, pero solo el ADMIN puede hacer click e ir a configuración */}
+            <div 
+              className="user-badge" 
+              onClick={() => { if (isAdmin) setPage("configuracion"); }} 
+              title={isAdmin ? "Configuración del sistema" : "Perfil de usuario"} 
+              style={{ marginLeft: "auto", cursor: isAdmin ? "pointer" : "default" }}
+            >
+              <span style={{ fontSize: 13, color: "var(--text1)" }}>
+                {isAdmin ? "⚙️" : "👤"} {user.nombres || user.nombre} {user.apellidos || user.apellido}
+              </span>
+              <span className={`user-role-pill ${isAdmin ? "role-admin" : "role-operario"}`}>
+                {isAdmin ? "Admin" : "Operario"}
+              </span>
             </div>
+
+            <button onClick={handleLogout} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", fontSize: 16, padding: "4px 8px", borderRadius: "6px" }} title="Cerrar sesión">↩</button>
           </div>
 
           <div className="layout">
-            <nav className="sidebar">
-              {["Principal", "Gestión"].map(section => {
-                const items = navItems.filter(n => n.section === section && (!n.adminOnly || isAdmin));
-                if (items.length === 0) return null;
-                return (
-                  <div className="sidebar-section" key={section}>
-                    <div className="sidebar-label">{section}</div>
-                    {items.map(n => (
-                      <div key={n.id} className={`nav-item${page === n.id ? " active" : ""}`} onClick={() => setPage(n.id)}>
-                        <span className="nav-icon">{n.icon}</span>
-                        {n.label}
-                        {n.badge && <span className="nav-badge">!</span>}
-                      </div>
-                    ))}
+            {!isConfigPage && (
+              <nav className="sidebar">
+                {["Principal", "Gestión"].map(section => {
+                  const items = navItems.filter(n => n.section === section && (!n.adminOnly || isAdmin));
+                  if (items.length === 0) return null;
+                  return (
+                    <div className="sidebar-section" key={section}>
+                      <div className="sidebar-label">{section}</div>
+                      {items.map(n => (
+                        <div key={n.id} className={`nav-item${page === n.id ? " active" : ""}`} onClick={() => setPage(n.id)}>
+                          <span className="nav-icon">{n.icon}</span>
+                          {n.label}
+                          {n.badge && <span className="nav-badge">!</span>}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+                <div className="sidebar-footer">
+                  <div className="sidebar-stat">
+                    <div className="sidebar-stat-label">STOCK TOTAL HOY</div>
+                    <div className="sidebar-stat-value">{Number(totalStock || 0).toFixed(1)} kg</div>
+                    <div className="sidebar-stat-sub">{app.materiales.filter(m => m.stock_kg > 0).length} materiales</div>
                   </div>
-                );
-              })}
-              <div className="sidebar-footer">
-                <div className="sidebar-stat">
-                  <div className="sidebar-stat-label">STOCK TOTAL HOY</div>
-                  <div className="sidebar-stat-value">{Number(totalStock || 0).toFixed(1)} kg</div>
-                  <div className="sidebar-stat-sub">{app.materiales.filter(m => m.stock_kg > 0).length} materiales</div>
                 </div>
-              </div>
-            </nav>
+              </nav>
+            )}
 
-            <main className="main">{renderPage()}</main>
+            <main className="main" style={isConfigPage ? { width: '100%', maxWidth: 960, margin: '0 auto' } : {}}>
+              {renderPage()}
+            </main>
           </div>
         </div>
       )}

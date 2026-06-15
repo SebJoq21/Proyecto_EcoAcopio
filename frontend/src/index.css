@@ -1269,3 +1269,23 @@ tbody td .main-cell { color: var(--text1); font-weight: 500; }
   .landing-footer-links { flex-direction: column; }
   .auth-form-wrap { padding: 24px 20px; }
 }
+/* Botones Globales */
+.btn-primary {
+  background-color: #10b981; /* Verde esmeralda */
+  color: #ffffff !important;
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--r, 8px);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary:hover {
+  background-color: #059669; /* Verde más oscuro al pasar el mouse */
+  transform: translateY(-1px);
+}
