@@ -49,6 +49,8 @@ export default function Landing({ onNavigate }) {
           width: 100%;
           padding: 20px 0;
           position: relative;
+          -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+          mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
         }
         .testimonios-pista {
           display: flex;
@@ -66,7 +68,7 @@ export default function Landing({ onNavigate }) {
         .paso-card {
           background: linear-gradient(to bottom, #ffffff, #f8fafc);
           border: 1px solid #e2e8f0;
-          border-top: 4px solid #10b981;
+          border-bottom: 6px solid #10b981;
           border-radius: 12px;
           padding: 40px 24px;
           text-align: center;
@@ -77,8 +79,119 @@ export default function Landing({ onNavigate }) {
           transform: translateY(-5px);
           box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
+        .eco-landing-wrapper {
+          position: relative;
+          background-color: #f8fafc;
+          background-image: radial-gradient(rgba(16, 185, 129, 0.15) 2px, transparent 2px);
+          background-size: 30px 30px;
+        }
+        .eco-landing-content {
+          position: relative;
+          z-index: 10;
+        }
+        .hero-section-clear {
+          padding: 100px 0;
+          background: transparent;
+          backdrop-filter: none;
+          -webkit-backdrop-filter: none;
+          position: relative;
+          z-index: 10;
+        }
+        .glass-section {
+          padding: 100px 0;
+          background: rgba(255, 255, 255, 0.5);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+        }
+        .glass-section-alt {
+          padding: 100px 0;
+          background: linear-gradient(to bottom, rgba(236, 253, 245, 0.4), rgba(255, 255, 255, 0.2));
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+        }
+        .eco-divider {
+          width: 100%;
+          height: 3px;
+          background: linear-gradient(to right, rgba(16, 185, 129, 0) 0%, #10b981 10%, #10b981 90%, rgba(16, 185, 129, 0) 100%);
+          margin: 0;
+          position: relative;
+          z-index: 20;
+        }
+        .css-plant {
+          position: fixed;
+          z-index: 0;
+          opacity: 0.6;
+          pointer-events: none;
+        }
+        .plant-left {
+          bottom: -50px;
+          left: -50px;
+          animation: swayLeft 8s ease-in-out infinite alternate;
+        }
+        @keyframes swayLeft {
+          0% { transform: rotate(-2deg); }
+          100% { transform: rotate(3deg); }
+        }
+        .plant-right {
+          top: 10%;
+          right: -80px;
+          animation: swayRight 9s ease-in-out infinite alternate;
+        }
+        @keyframes swayRight {
+          0% { transform: scaleX(-1) rotate(5deg); }
+          100% { transform: scaleX(-1) rotate(12deg); }
+        }
+        .plant-middle {
+          top: 45%;
+          left: -100px;
+          transform: scale(0.7);
+          animation: swayMiddle 12s ease-in-out infinite alternate;
+        }
+        @keyframes swayMiddle {
+          0% { transform: scale(0.7) rotate(15deg); }
+          100% { transform: scale(0.7) rotate(25deg); }
+        }
+        .css-leaf {
+          position: absolute;
+          border-radius: 0 100% 0 100%;
+          box-shadow: inset 10px 10px 20px rgba(255, 255, 255, 0.3), 0 15px 20px rgba(0,0,0,0.05);
+        }
+        .leaf-main {
+          width: 250px; height: 250px;
+          background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+          transform: rotate(45deg);
+          bottom: 0; left: 80px;
+        }
+        .leaf-side-1 {
+          width: 150px; height: 150px;
+          background: linear-gradient(135deg, #6ee7b7 0%, #34d399 100%);
+          transform: rotate(15deg);
+          bottom: 120px; left: -10px;
+        }
+        .leaf-side-2 {
+          width: 120px; height: 120px;
+          background: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 100%);
+          transform: rotate(75deg);
+          bottom: 30px; left: 220px;
+        }
       `}</style>
-      <div className="landing">
+      <div className="eco-landing-wrapper landing">
+        <div className="css-plant plant-left">
+          <div className="css-leaf leaf-main"></div>
+          <div className="css-leaf leaf-side-1"></div>
+          <div className="css-leaf leaf-side-2"></div>
+        </div>
+        <div className="css-plant plant-middle">
+          <div className="css-leaf leaf-main"></div>
+          <div className="css-leaf leaf-side-1"></div>
+          <div className="css-leaf leaf-side-2"></div>
+        </div>
+        <div className="css-plant plant-right">
+          <div className="css-leaf leaf-main"></div>
+          <div className="css-leaf leaf-side-1"></div>
+          <div className="css-leaf leaf-side-2"></div>
+        </div>
+        <div className="eco-landing-content">
       <nav className="landing-nav">
         <div className="landing-nav-inner">
           <div className="landing-logo" onClick={() => scrollTo("hero")} style={{ cursor: "pointer" }}>
@@ -104,7 +217,7 @@ export default function Landing({ onNavigate }) {
         </div>
       </nav>
 
-      <section id="hero" className="landing-hero landing-section">
+      <section id="hero" className="landing-hero landing-section hero-section-clear">
         <div className="landing-hero-bg">
           <div className="landing-hero-shape shape-1" />
           <div className="landing-hero-shape shape-2" />
@@ -132,7 +245,6 @@ export default function Landing({ onNavigate }) {
         <div className="landing-hero-visual">
           <div className="hero-floating-container">
             <div className="hero-floating-main hero-panel">
-              <div className="hero-panel-grid-bg" />
               <div className="hero-panel-header">El problema global</div>
               <div className="hero-panel-body">
                 <div className="hero-panel-item">
@@ -191,8 +303,9 @@ export default function Landing({ onNavigate }) {
           </div>
         </div>
       </section>
+      <div className="eco-divider"></div>
 
-      <section id="about" className="landing-about landing-section">
+      <section id="about" className="landing-about landing-section glass-section-alt">
         <div className="landing-section-inner">
           <div className="landing-about-grid">
             <div className="landing-about-content">
@@ -243,8 +356,9 @@ export default function Landing({ onNavigate }) {
           </div>
         </div>
       </section>
+      <div className="eco-divider"></div>
 
-      <section id="features" className="landing-features-section landing-section" style={{ backgroundColor: '#f8fafc' }}>
+      <section id="features" className="landing-features-section landing-section glass-section">
         <div className="landing-section-inner">
           <span className="landing-section-tag">Características</span>
           <h2 className="landing-section-title">Todo lo que necesitas para tu centro de acopio</h2>
@@ -262,9 +376,10 @@ export default function Landing({ onNavigate }) {
           </div>
         </div>
       </section>
+      <div className="eco-divider"></div>
 
 
-      <section id="process" className="landing-process landing-section">
+      <section id="process" className="landing-process landing-section glass-section-alt">
         <div className="landing-section-inner">
           <span className="landing-section-tag">¿Cómo funciona?</span>
           <h2 className="landing-section-title">Tres pasos para transformar tu operación</h2>
@@ -298,8 +413,9 @@ export default function Landing({ onNavigate }) {
           </div>
         </div>
       </section>
+      <div className="eco-divider"></div>
 
-      <section id="testimonials" className="landing-testimonials landing-section" style={{ backgroundColor: '#f8fafc' }}>
+      <section id="testimonials" className="landing-testimonials landing-section glass-section">
         <div className="landing-section-inner">
           <span className="landing-section-tag">Testimonios</span>
           <h2 className="landing-section-title">Lo que dicen nuestros usuarios</h2>
@@ -325,8 +441,9 @@ export default function Landing({ onNavigate }) {
           </div>
         </div>
       </section>
+      <div className="eco-divider"></div>
 
-      <section id="faq" className="landing-faq landing-section">
+      <section id="faq" className="landing-faq landing-section glass-section-alt">
         <div className="landing-section-inner">
           <span className="landing-section-tag">FAQ</span>
           <h2 className="landing-section-title">Preguntas frecuentes</h2>
@@ -348,8 +465,9 @@ export default function Landing({ onNavigate }) {
           </div>
         </div>
       </section>
+      <div className="eco-divider"></div>
 
-      <section id="contact" className="landing-contact landing-section" style={{ backgroundColor: '#f8fafc' }}>
+      <section id="contact" className="landing-contact landing-section glass-section">
         <div className="landing-section-inner">
           <span className="landing-section-tag">Contacto</span>
           <h2 className="landing-section-title">Contáctanos</h2>
@@ -402,6 +520,7 @@ export default function Landing({ onNavigate }) {
           </div>
         </div>
       </section>
+      <div className="eco-divider"></div>
 
       <section className="landing-cta-section landing-section">
         <div className="landing-cta-content">
@@ -434,7 +553,8 @@ export default function Landing({ onNavigate }) {
           <p>© 2026 EcoAcopio. Todos los derechos reservados.</p>
         </div>
       </footer>
-    </div>
+      </div>
+      </div>
     </>
   );
 }
