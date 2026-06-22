@@ -5,8 +5,7 @@ const features = [
   { icon: "📦", title: "Inventario en Tiempo Real", desc: "Monitorea tus existencias al instante. Visualiza stock, tendencias y alertas en un solo lugar." },
   { icon: "📊", title: "Reportes Inteligentes", desc: "Genera reportes detallados con análisis de tendencias para tomar decisiones informadas." },
   { icon: "👥", title: "Gestión de Proveedores", desc: "Administra tu red de proveedores con historial completo de transacciones y pagos." },
-  { icon: "🔍", title: "Auditoría y Trazabilidad", desc: "Registro completo de cada operación con trazabilidad total y certificación digital." },
-  { icon: "🤖", title: "Escaneo Inteligente", desc: "Identificación automática de materiales con asistencia de IA para mayor precisión." }
+  { icon: "🔍", title: "Auditoría y Trazabilidad", desc: "Registro completo de cada operación con trazabilidad total y certificación digital." }
 ];
 
 const steps = [
@@ -203,7 +202,7 @@ export default function Landing({ onNavigate }) {
         </div>
       </section>
 
-      <section id="features" className="landing-features-section landing-section">
+      <section id="features" className="landing-features-section landing-section" style={{ backgroundColor: '#f8fafc' }}>
         <div className="landing-section-inner">
           <span className="landing-section-tag">Características</span>
           <h2 className="landing-section-title">Todo lo que necesitas para tu centro de acopio</h2>
@@ -243,7 +242,7 @@ export default function Landing({ onNavigate }) {
         </div>
       </section>
 
-      <section id="testimonials" className="landing-testimonials landing-section">
+      <section id="testimonials" className="landing-testimonials landing-section" style={{ backgroundColor: '#f8fafc' }}>
         <div className="landing-section-inner">
           <span className="landing-section-tag">Testimonios</span>
           <h2 className="landing-section-title">Lo que dicen nuestros usuarios</h2>
@@ -291,7 +290,7 @@ export default function Landing({ onNavigate }) {
         </div>
       </section>
 
-      <section id="contact" className="landing-contact landing-section">
+      <section id="contact" className="landing-contact landing-section" style={{ backgroundColor: '#f8fafc' }}>
         <div className="landing-section-inner">
           <span className="landing-section-tag">Contacto</span>
           <h2 className="landing-section-title">Contáctanos</h2>
