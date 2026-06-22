@@ -295,7 +295,6 @@ tbody td .main-cell { color: var(--text1); font-weight: 500; }
 .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin .6s linear infinite; }
 
 /* ===== LOGIN ===== */
-.login-screen { position: fixed; inset: 0; background: var(--bg0); display: flex; align-items: center; justify-content: center; z-index: 9999; }
 .login-card { width: 380px; max-width: 92vw; background: var(--bg1); border: 1px solid var(--border2); border-radius: var(--r-lg); padding: 36px; box-shadow: var(--shadow); }
 .login-logo { text-align: center; margin-bottom: 28px; }
 .login-logo .logo-icon { width: 54px; height: 54px; font-size: 26px; margin: 0 auto 12px; }

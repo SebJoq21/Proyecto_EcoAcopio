@@ -149,8 +149,11 @@ export default function AuthPage({ onLogin, showToast, onNavigate, initialTab = 
   };
 
   return (
-    <div className="login-screen">
-      <div className="auth-container">
+    <div className="auth-container" style={{
+      border: '1px solid rgba(0, 0, 0, 0.08)',
+      borderRadius: '16px',
+      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 15px rgba(0, 0, 0, 0.05)'
+    }}>
         <div className="auth-brand">
           <div className="auth-brand-content">
             <div className="auth-brand-icon">♻️</div>
@@ -309,6 +312,5 @@ export default function AuthPage({ onLogin, showToast, onNavigate, initialTab = 
 
         </div>
       </div>
-    </div>
   );
 }

@@ -144,9 +144,23 @@ export default function App() {
 
   return (
     <>
-      {!user && page === "landing" && <LandingPage onNavigate={handleNavigate} />}
+      {!user && (page === "landing" || page === "auth") && <LandingPage onNavigate={handleNavigate} />}
+
       {!user && page === "auth" && (
-        <AuthPage onLogin={handleLogin} showToast={showToast} onNavigate={handleNavigate} initialTab={authTab} />
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(248, 250, 252, 0.15)',
+          backdropFilter: 'blur(5px)',
+          WebkitBackdropFilter: 'blur(5px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <AuthPage onLogin={handleLogin} showToast={showToast} onNavigate={handleNavigate} initialTab={authTab} />
+        </div>
       )}
 
       {user && (
