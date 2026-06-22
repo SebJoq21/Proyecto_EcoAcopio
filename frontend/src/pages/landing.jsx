@@ -98,22 +98,22 @@ export default function Landing({ onNavigate }) {
           z-index: 10;
         }
         .glass-section {
+          background: rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(5px);
+          -webkit-backdrop-filter: blur(5px);
           padding: 100px 0;
-          background: rgba(255, 255, 255, 0.5);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-        }
-        .glass-section-alt {
-          padding: 100px 0;
-          background: linear-gradient(to bottom, rgba(236, 253, 245, 0.4), rgba(255, 255, 255, 0.2));
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
+          margin: 0;
+          border: none;
+          position: relative;
+          z-index: 10;
         }
         .eco-divider {
           width: 100%;
-          height: 3px;
-          background: linear-gradient(to right, rgba(16, 185, 129, 0) 0%, #10b981 10%, #10b981 90%, rgba(16, 185, 129, 0) 100%);
+          height: 2px;
+          background-color: rgba(16, 185, 129, 0.95);
+          box-shadow: 0px 0px 20px 4px rgba(16, 185, 129, 0.4);
           margin: 0;
+          border: none;
           position: relative;
           z-index: 20;
         }
@@ -305,7 +305,7 @@ export default function Landing({ onNavigate }) {
       </section>
       <div className="eco-divider"></div>
 
-      <section id="about" className="landing-about landing-section glass-section-alt">
+      <section id="about" className="landing-about landing-section glass-section">
         <div className="landing-section-inner">
           <div className="landing-about-grid">
             <div className="landing-about-content">
@@ -379,7 +379,7 @@ export default function Landing({ onNavigate }) {
       <div className="eco-divider"></div>
 
 
-      <section id="process" className="landing-process landing-section glass-section-alt">
+      <section id="process" className="landing-process landing-section glass-section">
         <div className="landing-section-inner">
           <span className="landing-section-tag">¿Cómo funciona?</span>
           <h2 className="landing-section-title">Tres pasos para transformar tu operación</h2>
@@ -443,7 +443,7 @@ export default function Landing({ onNavigate }) {
       </section>
       <div className="eco-divider"></div>
 
-      <section id="faq" className="landing-faq landing-section glass-section-alt">
+      <section id="faq" className="landing-faq landing-section glass-section">
         <div className="landing-section-inner">
           <span className="landing-section-tag">FAQ</span>
           <h2 className="landing-section-title">Preguntas frecuentes</h2>
