@@ -741,29 +741,14 @@ tbody td .main-cell { color: var(--text1); font-weight: 500; }
   position: relative;
 }
 .landing-step {
-  text-align: center;
   flex: 1;
   max-width: 320px;
   position: relative;
-}
-.landing-step-num {
-  font-size: 56px;
-  font-weight: 700;
-  color: var(--l-green);
-  opacity: .2;
-  margin-bottom: 12px;
-  font-family: var(--mono);
-  line-height: 1;
 }
 .landing-step-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
 .landing-step-desc { font-size: 14px; color: var(--l-text2); line-height: 1.6; }
 
 /* ===== TESTIMONIALS ===== */
-.landing-testimonials-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
 .landing-testimonial-card {
   background: var(--l-bg2);
   border: 1px solid var(--l-border);
@@ -1243,8 +1228,6 @@ tbody td .main-cell { color: var(--text1); font-weight: 500; }
   .landing-features { flex-direction: column; }
   .landing-features .landing-feature-card { flex: 1 1 auto; }
   .landing-steps { flex-direction: column; align-items: center; gap: 32px; }
-  .landing-testimonials-grid { grid-template-columns: 1fr; }
-  .landing-testimonials-grid .landing-testimonial-card:last-child { display: none; }
   .landing-contact-grid { grid-template-columns: 1fr; gap: 32px; }
   .about-card-grid { gap: 12px; }
   .landing-section-title { font-size: 28px; }

@@ -156,7 +156,20 @@ export default function AuthPage({ onLogin, showToast, onNavigate, initialTab = 
     }}>
         <div className="auth-brand">
           <div className="auth-brand-content">
-            <div className="auth-brand-icon">♻️</div>
+            <div style={{
+              backgroundColor: '#ffffff',
+              width: '70px',
+              height: '70px',
+              borderRadius: '50%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              fontSize: '40px',
+              margin: '0 auto 20px auto',
+              boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)'
+            }}>
+              ♻️
+            </div>
             <h2 className="auth-brand-title">EcoAcopio</h2>
             <p className="auth-brand-desc">Sistema de Gestión de Centros de Acopio</p>
             <div className="auth-brand-features">

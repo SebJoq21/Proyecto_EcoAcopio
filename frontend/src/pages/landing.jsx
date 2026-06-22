@@ -15,9 +15,11 @@ const steps = [
 ];
 
 const testimonials = [
-  { text: "EcoAcopio transformó la gestión de nuestro centro de acopio. Ahora podemos rastrear cada kilogramo y generar reportes en segundos.", name: "María García", role: "Gerente de Operaciones", org: "Centro Verde SAC" },
-  { text: "La plataforma nos ayudó a reducir pérdidas en un 40% y optimizar nuestro inventario. El escaneo con IA es increíblemente preciso.", name: "Carlos Mendoza", role: "Director General", org: "Recicladora del Sur" },
-  { text: "Implementar EcoAcopio fue la mejor decisión para nuestro centro. La trazabilidad que ofrece es clave para nuestra certificación ambiental.", name: "Ana Torres", role: "Coordinadora Ambiental", org: "EcoVida Perú" }
+  { nombre: "María García", cargo: "Gerente de Operaciones, Centro Verde SAC", texto: "EcoAcopio transformó la gestión de nuestro centro de acopio. Ahora podemos rastrear cada kilogramo y generar reportes en segundos.", iniciales: "MG" },
+  { nombre: "Carlos Mendoza", cargo: "Director General, Recicladora del Sur", texto: "La plataforma nos ayudó a reducir pérdidas en un 40% y optimizar nuestro inventario. El registro de pesajes es increíblemente rápido y preciso.", iniciales: "CM" },
+  { nombre: "Ana Torres", cargo: "Coordinadora Ambiental, EcoVida Perú", texto: "Implementar EcoAcopio fue la mejor decisión para nuestro centro. La trazabilidad que ofrece es clave para nuestra certificación ambiental.", iniciales: "AT" },
+  { nombre: "Javier Silva", cargo: "Jefe de Planta, Acopios del Norte", texto: "El control de proveedores nos ha salvado de muchos dolores de cabeza. La plataforma es súper intuitiva para que mis operarios la usen a diario.", iniciales: "JS" },
+  { nombre: "Lucía Fernández", cargo: "Fundadora, Recicla +", texto: "Dejamos los cuadernos y Excel atrás. Tener el stock actualizado en tiempo real nos permite negociar muchísimo mejor con nuestros compradores.", iniciales: "LF" }
 ];
 
 const faqs = [
@@ -36,7 +38,47 @@ export default function Landing({ onNavigate }) {
   };
 
   return (
-    <div className="landing">
+    <>
+      <style>{`
+        @keyframes carruselTestimonios {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(calc(-350px * 5 - 24px * 5)); }
+        }
+        .testimonios-contenedor {
+          overflow: hidden;
+          width: 100%;
+          padding: 20px 0;
+          position: relative;
+        }
+        .testimonios-pista {
+          display: flex;
+          gap: 24px;
+          width: max-content;
+          animation: carruselTestimonios 35s linear infinite;
+        }
+        .testimonios-pista:hover {
+          animation-play-state: paused;
+        }
+        .testimonio-card {
+          width: 350px;
+          min-width: 350px;
+        }
+        .paso-card {
+          background: linear-gradient(to bottom, #ffffff, #f8fafc);
+          border: 1px solid #e2e8f0;
+          border-top: 4px solid #10b981;
+          border-radius: 12px;
+          padding: 40px 24px;
+          text-align: center;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .paso-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+      `}</style>
+      <div className="landing">
       <nav className="landing-nav">
         <div className="landing-nav-inner">
           <div className="landing-logo" onClick={() => scrollTo("hero")} style={{ cursor: "pointer" }}>
@@ -231,8 +273,23 @@ export default function Landing({ onNavigate }) {
           </p>
           <div className="landing-steps">
             {steps.map((s, i) => (
-              <div key={i} className="landing-step">
-                <div className="landing-step-num">{s.num}</div>
+              <div key={i} className="landing-step paso-card">
+                <div style={{
+                  width: '56px',
+                  height: '56px',
+                  background: 'linear-gradient(135deg, #34d399 0%, #10b981 100%)',
+                  color: '#ffffff',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  fontSize: '22px',
+                  fontWeight: 'bold',
+                  margin: '0 auto 24px auto',
+                  boxShadow: '0 4px 10px rgba(16, 185, 129, 0.4), inset 0 2px 0 rgba(255,255,255,0.2)'
+                }}>
+                  {parseInt(s.num, 10)}
+                </div>
                 <h3 className="landing-step-title">{s.title}</h3>
                 <p className="landing-step-desc">{s.desc}</p>
                 {i < steps.length - 1 && <div className="landing-step-connector" />}
@@ -249,20 +306,22 @@ export default function Landing({ onNavigate }) {
           <p className="landing-section-sub">
             Conoce la experiencia de quienes ya confían en EcoAcopio.
           </p>
-          <div className="landing-testimonials-grid">
-            {testimonials.map((t, i) => (
-              <div key={i} className="landing-testimonial-card">
-                <div className="testimonial-quote">"</div>
-                <p className="testimonial-text">{t.text}</p>
-                <div className="testimonial-author">
-                  <div className="testimonial-avatar">{t.name.split(" ").map(n => n[0]).join("")}</div>
-                  <div>
-                    <div className="testimonial-name">{t.name}</div>
-                    <div className="testimonial-role">{t.role}, {t.org}</div>
+          <div className="testimonios-contenedor">
+            <div className="testimonios-pista">
+              {[...testimonials, ...testimonials].map((t, i) => (
+                <div key={i} className="testimonio-card landing-testimonial-card">
+                  <div className="testimonial-quote">"</div>
+                  <p className="testimonial-text">{t.texto}</p>
+                  <div className="testimonial-author">
+                    <div className="testimonial-avatar">{t.iniciales}</div>
+                    <div>
+                      <div className="testimonial-name">{t.nombre}</div>
+                      <div className="testimonial-role">{t.cargo}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -376,5 +435,6 @@ export default function Landing({ onNavigate }) {
         </div>
       </footer>
     </div>
+    </>
   );
 }
