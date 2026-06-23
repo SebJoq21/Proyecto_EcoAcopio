@@ -13,13 +13,9 @@ export default function AuthPage({ onLogin, showToast, onNavigate, initialTab = 
   });
   const [regLoading, setRegLoading] = useState(false);
   const [error, setError] = useState("");
+  const [regError, setRegError] = useState("");
   const [errores, setErrores] = useState({});
   const [loginErrores, setLoginErrores] = useState({});
-
-  const safeToast = (type, msg) => {
-    if (typeof showToast === "function") showToast(type, msg);
-    else if (type === "error") alert(msg);
-  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -48,7 +44,6 @@ export default function AuthPage({ onLogin, showToast, onNavigate, initialTab = 
     } catch (err) {
       const msg = err.message || "Error al iniciar sesión.";
       setError(msg);
-      safeToast("error", msg);
     } finally {
       setLoading(false);
     }
@@ -118,7 +113,7 @@ export default function AuthPage({ onLogin, showToast, onNavigate, initialTab = 
       if (typeof onLogin === "function") onLogin(u);
       else window.location.reload();
     } catch (err) {
-      safeToast("error", err.message || "Error al crear la cuenta.");
+      setRegError(err.message || "Error al crear la cuenta.");
     } finally {
       setRegLoading(false);
     }
@@ -149,7 +144,32 @@ export default function AuthPage({ onLogin, showToast, onNavigate, initialTab = 
   };
 
   return (
-    <div className="auth-container" style={{
+    <>
+      {(error || regError) && (
+        <div style={{
+          position: 'fixed',
+          top: '24px',
+          right: '24px',
+          zIndex: 99999,
+          background: '#fef2f2',
+          border: '1px solid #fecaca',
+          color: '#dc2626',
+          padding: '12px 20px',
+          borderRadius: '10px',
+          fontSize: '14px',
+          fontWeight: 500,
+          boxShadow: '0 10px 25px -5px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          maxWidth: '380px',
+          lineHeight: 1.4
+        }}>
+          <span style={{ fontSize: '18px' }}></span>
+          <span>{error || regError}</span>
+        </div>
+      )}
+      <div className="auth-container" style={{
       border: '1px solid rgba(0, 0, 0, 0.08)',
       borderRadius: '16px',
       boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 15px rgba(0, 0, 0, 0.05)'
@@ -187,13 +207,13 @@ export default function AuthPage({ onLogin, showToast, onNavigate, initialTab = 
           <div className="auth-tabs">
             <button
               className={`auth-tab${tab === "login" ? " active" : ""}`}
-              onClick={() => { setTab("login"); setError(""); setErrores({}); }}
+              onClick={() => { setTab("login"); setError(""); setRegError(""); setErrores({}); }}
             >
               Iniciar Sesión
             </button>
             <button
               className={`auth-tab${tab === "register" ? " active" : ""}`}
-              onClick={() => { setTab("register"); setError(""); setErrores({}); }}
+              onClick={() => { setTab("register"); setError(""); setRegError(""); setErrores({}); }}
             >
               Crear Cuenta
             </button>
@@ -325,5 +345,6 @@ export default function AuthPage({ onLogin, showToast, onNavigate, initialTab = 
 
         </div>
       </div>
+    </>
   );
 }
