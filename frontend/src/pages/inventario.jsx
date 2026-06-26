@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Api } from "../services/api";
+import { obtenerEmojiPorDefecto } from "../utils/emojis";
 
 export default function InventarioPage({ showToast }) {
   const [inventario, setInventario] = useState([]);
@@ -43,18 +44,22 @@ export default function InventarioPage({ showToast }) {
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
               <thead>
-                <tr style={{ textAlign: "left", borderBottom: "2px solid var(--border)", color: "var(--text2)" }}>
-                  <th style={{ padding: "12px 8px" }}>Código</th>
-                  <th style={{ padding: "12px 8px" }}>Material</th>
-                  <th style={{ padding: "12px 8px", textAlign: "right" }}>Stock Neto</th>
-                  <th style={{ padding: "12px 8px", textAlign: "right" }}>Última Actualización</th>
-                </tr>
+                  <tr style={{ textAlign: "left", borderBottom: "2px solid var(--border)", color: "var(--text2)" }}>
+                    <th style={{ padding: "12px 8px", width: 40 }}></th>
+                    <th style={{ padding: "12px 8px" }}>Código</th>
+                    <th style={{ padding: "12px 8px" }}>Material</th>
+                    <th style={{ padding: "12px 8px", textAlign: "right" }}>Stock Neto</th>
+                    <th style={{ padding: "12px 8px", textAlign: "right" }}>Última Actualización</th>
+                  </tr>
               </thead>
               <tbody>
                 {inventario.map((inv) => {
                   const mat = materiales.find(m => m.id_material === inv.id_material);
                   return (
                     <tr key={inv.id_inventario || inv.id_material} style={{ borderBottom: "1px solid var(--border)", color: "var(--text1)" }}>
+                      <td style={{ padding: "12px 8px", textAlign: "center", fontSize: 20 }}>
+                        {mat ? (mat.emoji || obtenerEmojiPorDefecto(mat.categoria?.nombre)) : "♻️"}
+                      </td>
                       <td style={{ padding: "12px 8px", fontWeight: 700, color: "var(--primary)" }}>
                         {mat ? mat.etiqueta : "—"}
                       </td>

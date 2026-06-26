@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Api } from "../services/api";
+import { obtenerEmojiPorDefecto } from "../utils/emojis";
 
 export default function DashboardPage({ app, onNav, showToast }) {
   const [allTxs, setAllTxs] = useState([]);
@@ -86,6 +87,7 @@ export default function DashboardPage({ app, onNav, showToast }) {
           <table>
             <thead>
               <tr>
+                <th style={{ width: 40 }}></th>
                 <th>Material</th>
                 <th>Proveedor</th>
                 <th>Peso</th>
@@ -97,7 +99,7 @@ export default function DashboardPage({ app, onNav, showToast }) {
             <tbody>
               {txs.length === 0 ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: "center", color: "var(--text3)", padding: 24 }}>
+                  <td colSpan={7} style={{ textAlign: "center", color: "var(--text3)", padding: 24 }}>
                     {loading ? "Sincronizando..." : "Sin registros aún"}
                   </td>
                 </tr>
@@ -119,13 +121,15 @@ export default function DashboardPage({ app, onNav, showToast }) {
                   if (t.material) {
                     if (typeof t.material === "object") {
                       nombreMaterial = t.material.nombre || "Material Desconocido";
-                      emojiMaterial = t.material.emoji || "♻️";
+                      const catName = t.material.categoria?.nombre;
+                      emojiMaterial = t.material.emoji || obtenerEmojiPorDefecto(catName);
                     } else {
                       nombreMaterial = String(t.material);
                     }
                   } else if (t.materiales) {
                     nombreMaterial = t.materiales.nombre || "Material Desconocido";
-                    emojiMaterial = t.materiales.emoji || "♻️";
+                    const catName = t.materiales.categoria?.nombre;
+                    emojiMaterial = t.materiales.emoji || obtenerEmojiPorDefecto(catName);
                   }
 
                   const tipoMov = (t.tipo_movimiento || t.tipo || "Entrada").toUpperCase();
@@ -134,8 +138,9 @@ export default function DashboardPage({ app, onNav, showToast }) {
 
                   return (
                     <tr key={t.id_pesaje || t.id || `row-${idx}`}>
+                      <td style={{ textAlign: "center", fontSize: 20 }}>{emojiMaterial}</td>
                       <td>
-                        <span className="main-cell">{emojiMaterial} {nombreMaterial}</span>
+                        <span className="main-cell">{nombreMaterial}</span>
                       </td>
                       <td>{nombreProveedor}</td>
                       <td className="mono" style={{ color: esEntrada ? "var(--green)" : "var(--red)" }}>

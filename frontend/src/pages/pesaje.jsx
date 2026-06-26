@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Api } from "../services/api";
+import { obtenerEmojiPorDefecto } from "../utils/emojis";
 
 export default function PesajePage({ app, showToast, onRefresh }) {
   // Catálogos locales para selectores dinámicos
@@ -249,6 +250,7 @@ export default function PesajePage({ app, showToast, onRefresh }) {
                   <thead>
                     <tr style={{ borderBottom: "2px solid var(--border)", color: "var(--text3)", textAlign: "left" }}>
                       <th style={{ padding: "8px 4px" }}>Flujo</th>
+                      <th style={{ padding: "8px 4px", width: 36 }}></th>
                       <th style={{ padding: "8px 4px" }}>Material</th>
                       <th style={{ padding: "8px 4px" }}>Tercero / Proveedor</th>
                       <th style={{ padding: "8px 4px", textAlign: "right" }}>Masa</th>
@@ -277,6 +279,9 @@ export default function PesajePage({ app, showToast, onRefresh }) {
                             <span className={`pill ${p.tipo_movimiento?.toUpperCase() === "VENTA" || p.tipo_movimiento?.toUpperCase() === "SALIDA" ? "pill-danger" : "pill-success"}`} style={{ fontSize: 11, padding: "2px 6px" }}>
                               {p.tipo_movimiento?.toUpperCase() === "VENTA" || p.tipo_movimiento?.toUpperCase() === "SALIDA" ? "📤 Venta" : "📥 Compra"}
                             </span>
+                          </td>
+                          <td style={{ textAlign: "center", fontSize: 18, padding: "12px 4px" }}>
+                            {mat ? (mat.emoji || obtenerEmojiPorDefecto(mat.categoria?.nombre)) : "♻️"}
                           </td>
                           <td style={{ padding: "12px 4px", fontWeight: 500 }}>
                             {mat ? `[${mat.etiqueta || mat.codigo}] ${mat.nombre}` : "Cargando material..."}

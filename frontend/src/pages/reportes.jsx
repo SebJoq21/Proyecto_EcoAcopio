@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Api } from "../services/api";
+import { obtenerEmojiPorDefecto } from "../utils/emojis";
 
 export default function ReportesPage({ app, showToast }) {
   const isAdmin = app.role === "admin";
@@ -122,6 +123,7 @@ export default function ReportesPage({ app, showToast }) {
                 <thead>
                   <tr>
                     <th>Fecha</th>
+                    <th style={{ width: 40 }}></th>
                     <th>Material</th>
                     <th>Proveedor</th>
                     <th>Peso (kg)</th>
@@ -131,7 +133,7 @@ export default function ReportesPage({ app, showToast }) {
                 <tbody>
                   {(!result.detalles || result.detalles.length === 0) ? (
                     <tr>
-                      <td colSpan={5} style={{ textAlign: "center", color: "var(--text3)", padding: 24 }}>
+                      <td colSpan={6} style={{ textAlign: "center", color: "var(--text3)", padding: 24 }}>
                         Sin transacciones en este período
                       </td>
                     </tr>
@@ -142,7 +144,8 @@ export default function ReportesPage({ app, showToast }) {
                       return (
                         <tr key={t.id_pesaje || i}>
                           <td className="mono">{new Date(t.fecha_creacion).toLocaleDateString("es-PE")}</td>
-                          <td>♻️ {t.material?.nombre || "—"}</td>
+                          <td style={{ textAlign: "center", fontSize: 18 }}>{t.material?.emoji || obtenerEmojiPorDefecto(t.material?.categoria?.nombre)}</td>
+                          <td>{t.material?.nombre || "—"}</td>
                           <td>{t.proveedor?.nombre_completo || "—"}</td>
                           <td className={`mono ${esEntrada ? "text-green" : "text-red"}`}>
                             {esEntrada ? "+" : "−"}{Number(t.peso_kg || 0).toFixed(2)}

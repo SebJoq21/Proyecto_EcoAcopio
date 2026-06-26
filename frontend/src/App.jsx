@@ -5,6 +5,7 @@ import { Api } from "./services/api";
 import { useToast, ToastContainer } from "./hooks/useToast";
 import { useClock } from "./hooks/useClock";
 import { useTheme } from "./hooks/useTheme";
+import { obtenerEmojiPorDefecto } from "./utils/emojis";
 
 import LandingPage from "./pages/landing";
 import AuthPage from "./pages/login";
@@ -56,18 +57,22 @@ export default function App() {
         inv[idMat] = parseFloat(i.stock_kg || i.cantidad || 0); 
       });
 
-      const mats = (matsData || []).map(m => ({
-        id_material: m.id_material, 
-        id: m.id_material, 
-        codigo: m.etiqueta || m.codigo, 
-        nombre: m.nombre, 
-        id_categoria: m.id_categoria,
-        categoria: m.categoria || "—",
-        precio: parseFloat(m.precio_referencial_kg || m.precio || 0), 
-        activo: m.activo || m.active || false,
-        emoji: m.emoji || "♻️", 
-        stock_kg: inv[m.id_material] ?? 0,
-      }));
+      const mats = (matsData || []).map(m => {
+        const nombreCat = m.categoria?.nombre || (typeof m.categoria === "string" ? m.categoria : "—");
+        const emojiDefecto = obtenerEmojiPorDefecto(nombreCat);
+        return {
+          id_material: m.id_material, 
+          id: m.id_material, 
+          codigo: m.etiqueta || m.codigo, 
+          nombre: m.nombre, 
+          id_categoria: m.id_categoria,
+          categoria: nombreCat,
+          precio: parseFloat(m.precio_referencial_kg || m.precio || 0), 
+          activo: m.activo || m.active || false,
+          emoji: m.emoji || emojiDefecto, 
+          stock_kg: inv[m.id_material] ?? 0,
+        };
+      });
 
       const provs = (provsData || []).map(p => ({
         id_proveedor: p.id_proveedor || p.id_provider || p.id,            

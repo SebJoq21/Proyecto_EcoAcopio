@@ -45,7 +45,7 @@ export class CierreRepository {
         }
       },
       include: {
-        material: { select: { nombre: true } },
+        material: { select: { nombre: true, emoji: true, categoria: { select: { nombre: true } } } },
         proveedor: { select: { nombre_completo: true } }
       },
       orderBy: { fecha_creacion: 'asc' }

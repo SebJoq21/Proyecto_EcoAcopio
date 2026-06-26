@@ -4,6 +4,7 @@ export interface CreateMaterialDTO {
   etiqueta: string; // Ej: "PET", "CARTON-1"
   nombre: string;   // Ej: "Plástico PET Transparente"
   precio_referencial_kg: number;
+  emoji?: string;
 }
 
 export interface UpdateMaterialDTO {
@@ -12,4 +13,5 @@ export interface UpdateMaterialDTO {
   nombre?: string;
   precio_referencial_kg?: number;
   activo?: boolean;
+  emoji?: string;
 }

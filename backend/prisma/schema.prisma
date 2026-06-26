@@ -80,6 +80,7 @@ model Material {
   nombre                String  @db.VarChar(100)
   precio_referencial_kg Decimal @default(0.00) @db.Decimal(10, 2)
   activo                Boolean @default(true)
+  emoji                 String? @db.VarChar(50)
 
   // Relaciones
   empresa     Empresa           @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)

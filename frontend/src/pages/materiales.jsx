@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
 import { Api } from "../services/api";
+import { emojisDisponibles, obtenerEmojiPorDefecto } from "../utils/emojis";
 
 export default function MaterialesPage({ showToast, onRefresh }) {
   const [materiales, setMateriales] = useState([]);
   const [categorias, setCategorias] = useState([]);
-  
+
   // Estado para el formulario de creación (campos idénticos a la estructura de la DB)
   const [formulario, setFormulario] = useState({
     id_categoria: "",
     etiqueta: "",
     nombre: "",
     precio_referencial_kg: "",
+    emoji: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -50,7 +52,7 @@ export default function MaterialesPage({ showToast, onRefresh }) {
   // Enviar el nuevo material cumpliendo las restricciones NOT NULL de Postgres
   const registrarMaterial = async (e) => {
     e.preventDefault();
-    const { id_categoria, etiqueta, nombre, precio_referencial_kg } = formulario;
+    const { id_categoria, etiqueta, nombre, precio_referencial_kg, emoji } = formulario;
 
     // Validaciones básicas en el cliente antes de golpear el backend
     if (!id_categoria || !etiqueta.trim() || !nombre.trim() || !precio_referencial_kg) {
@@ -62,10 +64,11 @@ export default function MaterialesPage({ showToast, onRefresh }) {
     try {
       // El payload se envía plano tal como lo requiere la tabla 'materiales'
       await Api.crearMaterial({
-        id_categoria, // Pasa el UUID seleccionado en el <select> de forma transparente
-        etiqueta: etiqueta.trim().toUpperCase(), // Ej: PET, ALU, CART
+        id_categoria,
+        etiqueta: etiqueta.trim().toUpperCase(),
         nombre: nombre.trim(),
-        precio_referencial_kg: parseFloat(precio_referencial_kg)
+        precio_referencial_kg: parseFloat(precio_referencial_kg),
+        emoji: emoji || undefined
       });
 
       if (typeof showToast === "function") {
@@ -73,7 +76,7 @@ export default function MaterialesPage({ showToast, onRefresh }) {
       }
       
       // Limpiamos el formulario
-      setFormulario({ id_categoria: "", etiqueta: "", nombre: "", precio_referencial_kg: "" });
+      setFormulario({ id_categoria: "", etiqueta: "", nombre: "", precio_referencial_kg: "", emoji: "" });
       
       // Sincronizamos la lista local y notificamos a App.jsx si es necesario
       cargarDatosPantalla();
@@ -154,6 +157,35 @@ export default function MaterialesPage({ showToast, onRefresh }) {
               />
             </div>
 
+            <div className="form-group" style={{ marginBottom: 16 }}>
+              <label className="form-label">Icono / Emoji representativo</label>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {emojisDisponibles.map((item) => (
+                  <button
+                    key={item.emoji}
+                    type="button"
+                    title={item.label}
+                    onClick={() => setFormulario((prev) => ({ ...prev, emoji: prev.emoji === item.emoji ? "" : item.emoji }))}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      fontSize: 20,
+                      border: formulario.emoji === item.emoji ? "2px solid var(--primary)" : "1px solid var(--border)",
+                      borderRadius: 8,
+                      cursor: "pointer",
+                      background: formulario.emoji === item.emoji ? "rgba(99, 102, 241, 0.1)" : "transparent",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    {item.emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="form-group" style={{ marginBottom: 20 }}>
               <label className="form-label">Precio Referencial por Kg ($)</label>
               <input
@@ -187,6 +219,7 @@ export default function MaterialesPage({ showToast, onRefresh }) {
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
                 <thead>
                   <tr style={{ textAlign: "left", borderBottom: "2px solid var(--border)", color: "var(--text2)" }}>
+                    <th style={{ padding: "12px 8px", width: 40 }}></th>
                     <th style={{ padding: "12px 8px" }}>Código</th>
                     <th style={{ padding: "12px 8px" }}>Nombre</th>
                     <th style={{ padding: "12px 8px" }}>Categoría</th>
@@ -202,6 +235,9 @@ export default function MaterialesPage({ showToast, onRefresh }) {
 
                     return (
                       <tr key={mat.id_material} style={{ borderBottom: "1px solid var(--border)", color: "var(--text1)" }}>
+                        <td style={{ padding: "12px 8px", textAlign: "center", fontSize: 20 }}>
+                          {mat.emoji || obtenerEmojiPorDefecto(nombreCategoriaLegible)}
+                        </td>
                         <td style={{ padding: "12px 8px", fontWeight: 700, color: "var(--primary)" }}>
                           {mat.etiqueta}
                         </td>

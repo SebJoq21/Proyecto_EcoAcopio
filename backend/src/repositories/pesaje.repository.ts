@@ -7,7 +7,7 @@ export class PesajeRepository {
     return await prisma.pesaje.findMany({
       where: { id_empresa: id_empresa },
       include: {
-        material: { select: { nombre: true, etiqueta: true } },
+        material: { select: { nombre: true, etiqueta: true, emoji: true, categoria: { select: { nombre: true } } } },
         proveedor: { select: { nombre_completo: true, numero_documento: true } },
         usuario: { select: { nombres: true, apellidos: true } }
       },
@@ -20,7 +20,7 @@ export class PesajeRepository {
     return await prisma.pesaje.findUnique({
       where: { id_pesaje: id },
       include: {
-        material: { select: { nombre: true, etiqueta: true } },
+        material: { select: { nombre: true, etiqueta: true, emoji: true, categoria: { select: { nombre: true } } } },
         proveedor: { select: { nombre_completo: true, numero_documento: true } },
         usuario: { select: { nombres: true, apellidos: true } }
       }
