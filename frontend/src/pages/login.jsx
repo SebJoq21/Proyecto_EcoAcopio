@@ -146,7 +146,7 @@ export default function AuthPage({ onLogin, showToast, onNavigate, initialTab = 
   return (
     <>
       {(error || regError) && (
-        <div style={{
+        <div className="toast-error" style={{
           position: 'fixed',
           top: '24px',
           right: '24px',
