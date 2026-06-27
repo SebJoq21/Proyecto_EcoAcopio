@@ -2,13 +2,18 @@ describe('Gestión de Materiales (CRUD)', () => {
   beforeEach(() => {
     // Iniciamos sesión programáticamente para no demorar los tests
     cy.login('admin@recicladora.com', 'admin123');
-    cy.visit('/');
     
-    // Esperamos a que la barra superior esté visible (lo que confirma que cargó el Dashboard)
+    // Esperamos a que los requests de carga inicial terminen para garantizar que React no desmonte el DOM del sidebar
+    cy.wait(['@meRequest', '@materialesRequest', '@proveedoresRequest', '@inventarioRequest']);
+
+    // Esperamos a que la barra superior esté visible
     cy.get('.topbar').should('be.visible');
 
     // Navegamos a la sección de Lista Maestra de Materiales
     cy.contains('.nav-item', 'Lista Maestra').click();
+
+    // Esperamos a que la página cambie e imprima el título principal
+    cy.contains('h1', 'Lista Maestra de Materiales').should('exist');
   });
 
   it('debería mostrar la tabla de catálogo y el formulario de alta', () => {

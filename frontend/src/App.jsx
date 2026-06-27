@@ -18,6 +18,7 @@ import ReportesPage from "./pages/reportes";
 import MaterialesPage from "./pages/materiales";
 import AuditoriaPage from "./pages/auditoria";
 import ConfiguracionPage from "./pages/configuracion";
+import ScannerPage from "./pages/scanner";
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -124,6 +125,7 @@ export default function App() {
     { id: "dashboard", icon: "📊", label: "Dashboard", section: "Principal" },
     { id: "pesaje", icon: "⚖️", label: "Registro de Pesaje", section: "Principal" },
     { id: "inventario", icon: "📦", label: "Inventario", section: "Principal" },
+    { id: "scanner", icon: "🤖", label: "Escáner IA", section: "Principal" },
     { id: "categorias", icon: "🏷️", label: "Categorías", section: "Gestión", adminOnly: true },
     { id: "proveedores", icon: "👥", label: "Proveedores", section: "Gestión" },
     { id: "reportes", icon: "📋", label: "Reportes", section: "Gestión", adminOnly: true },
@@ -143,6 +145,7 @@ export default function App() {
       case "materiales": return <MaterialesPage {...props} />;
       case "auditoria": return <AuditoriaPage {...props} />;
       case "configuracion": return <ConfiguracionPage {...props} />;
+      case "scanner": return <ScannerPage {...props} />;
       default: return null;
     }
   };
