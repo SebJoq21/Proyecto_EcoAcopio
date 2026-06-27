@@ -2,13 +2,18 @@ describe('Registro de Pesajes en Balanza', () => {
   beforeEach(() => {
     // Iniciamos sesión programáticamente
     cy.login('admin@recicladora.com', 'admin123');
-    cy.visit('/');
     
-    // Esperamos a que la barra superior esté visible (lo que confirma que cargó el Dashboard)
+    // Esperamos a que los requests de carga inicial terminen para garantizar estabilidad en el DOM
+    cy.wait(['@meRequest', '@materialesRequest', '@proveedoresRequest', '@inventarioRequest']);
+
+    // Esperamos a que la barra superior esté visible
     cy.get('.topbar').should('be.visible');
 
     // Navegamos al panel de Pesajes
     cy.contains('.nav-item', 'Registro de Pesaje').click();
+
+    // Esperamos a que la página cambie e imprima el título principal
+    cy.contains('h1', 'Registro de Pesajes en Balanza').should('exist');
   });
 
   it('debería cargar el formulario y el historial de últimos pesajes', () => {
