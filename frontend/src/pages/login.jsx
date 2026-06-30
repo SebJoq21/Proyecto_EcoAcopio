@@ -224,7 +224,7 @@ export default function AuthPage({ onLogin, showToast, onNavigate, initialTab = 
               <div className="auth-steps">
                 <div className={`auth-step ${step === 1 ? "active" : ""}`}>
                   <span className="auth-step-num">1</span>
-                  <span>Administrador</span>
+                  <span>Usuario</span>
                 </div>
                 <div className="auth-step-line" />
                 <div className={`auth-step ${step === 2 ? "active" : ""}`}>
@@ -233,7 +233,7 @@ export default function AuthPage({ onLogin, showToast, onNavigate, initialTab = 
                 </div>
               </div>
               <p className="auth-step-label">
-                {step === 1 ? "Datos del Administrador" : "Datos de la Empresa"}
+                {step === 1 ? "Datos del usuario" : "Datos de la Empresa"}
               </p>
             </>
           )}
@@ -279,7 +279,7 @@ export default function AuthPage({ onLogin, showToast, onNavigate, initialTab = 
                     </div>
                     <div className="form-group">
                       <label className={`form-label ${errores.userEmail ? "text-red-500" : ""}`}>Correo Electrónico</label>
-                      <input type="email" className={`form-input ${errores.userEmail ? "border-red-500 focus:ring-red-200 focus:border-red-500" : ""}`} placeholder="admin@recicladora.com"
+                      <input type="email" className={`form-input ${errores.userEmail ? "border-red-500 focus:ring-red-200 focus:border-red-500" : ""}`} placeholder="usuario@gmail.com"
                         value={form.userEmail} onChange={e => { setForm({ ...form, userEmail: e.target.value }); limpiarError("userEmail"); }} disabled={regLoading} autoComplete="email" />
                     </div>
                     <div className="form-group" style={{ marginBottom: 24 }}>
