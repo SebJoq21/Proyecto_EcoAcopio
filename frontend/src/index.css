@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap');
 
 :root {
   --bg0: #f1f5f9;
@@ -33,6 +33,7 @@
   --teal-border: #99f6e4;
   --accent: #22c97a;
   --font: 'Space Grotesk', sans-serif;
+  --font-landing: 'Bricolage Grotesque', sans-serif;
   --mono: 'JetBrains Mono', monospace;
   --r: 10px;
   --r-sm: 6px;
@@ -74,6 +75,7 @@
   --teal-border: #1a3a3a;
   --accent: #22c97a;
   --font: 'Space Grotesk', sans-serif;
+  --font-landing: 'Bricolage Grotesque', sans-serif;
   --mono: 'JetBrains Mono', monospace;
   --r: 10px;
   --r-sm: 6px;
@@ -320,7 +322,7 @@ tbody td .main-cell { color: var(--text1); font-weight: 500; }
   --l-green-light: #10b981;
   --l-border: #e5e7eb;
 
-  font-family: var(--font);
+  font-family: var(--font-landing);
   background: var(--l-bg);
   color: var(--l-text);
   height: 100%;
@@ -410,7 +412,7 @@ tbody td .main-cell { color: var(--text1); font-weight: 500; }
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: var(--font);
+  font-family: var(--font-landing);
   font-size: 14px;
   font-weight: 600;
   padding: 10px 20px;
@@ -810,7 +812,7 @@ tbody td .main-cell { color: var(--text1); font-weight: 500; }
   padding: 18px 20px;
   background: none;
   border: none;
-  font-family: var(--font);
+  font-family: var(--font-landing);
   font-size: 15px;
   font-weight: 500;
   color: var(--l-text);
@@ -873,7 +875,7 @@ tbody td .main-cell { color: var(--text1); font-weight: 500; }
   width: 100%;
   outline: none;
   transition: border-color .2s, box-shadow .2s;
-  font-family: var(--font);
+  font-family: var(--font-landing);
 }
 .landing-contact-form .form-input:focus,
 .landing-contact-form .form-textarea:focus {
