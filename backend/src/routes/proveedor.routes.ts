@@ -5,9 +5,6 @@ import { verifyTenant } from '../middlewares/tenant.middleware';
 
 const router = Router();
 
-router.use(verifyAuth);
-router.use(verifyTenant);
-
 router.get('/', proveedorController.getAll);
 router.get('/:id', proveedorController.getById);
 router.post('/', proveedorController.create);

@@ -30,19 +30,51 @@ export default function PesajePage({ app, showToast, onRefresh }) {
   const cargarCatalogos = async () => {
     try {
       setFetching(true);
-      const [listaCats, listaMats, listaProvs, listaPesajes] = await Promise.all([
+
+      const resultados = await Promise.allSettled([
         Api.categorias(),
         Api.materiales(true),
         Api.proveedores(),
         Api.pesajes(`?limit=10`)
       ]);
 
-      setCategorias(Array.isArray(listaCats) ? listaCats : []);
-      setMaterialesTodos(Array.isArray(listaMats) ? listaMats : []);
-      setProveedores(Array.isArray(listaProvs) ? listaProvs : []);
-      setUltimosPesajes(Array.isArray(listaPesajes) ? listaPesajes : (listaPesajes?.items || []));
+      const [rCats, rMats, rProvs, rPesajes] = resultados;
+
+      if (rCats.status === "fulfilled") {
+        setCategorias(Array.isArray(rCats.value) ? rCats.value : []);
+      } else {
+        console.error("Error al cargar categorías:", rCats.reason);
+        setCategorias([]);
+      }
+
+      if (rMats.status === "fulfilled") {
+        setMaterialesTodos(Array.isArray(rMats.value) ? rMats.value : []);
+      } else {
+        console.error("Error al cargar materiales:", rMats.reason);
+        setMaterialesTodos([]);
+      }
+
+      if (rProvs.status === "fulfilled") {
+        setProveedores(Array.isArray(rProvs.value) ? rProvs.value : []);
+      } else {
+        console.error("Error al cargar proveedores:", rProvs.reason);
+        setProveedores([]);
+      }
+
+      if (rPesajes.status === "fulfilled") {
+        const val = rPesajes.value;
+        setUltimosPesajes(Array.isArray(val) ? val : (val?.items || []));
+      } else {
+        console.error("Error al cargar pesajes:", rPesajes.reason);
+        setUltimosPesajes([]);
+      }
+
+      const algunaFallo = resultados.some(r => r.status === "rejected");
+      if (algunaFallo) {
+        showToast("warning", "Algunos catálogos no se pudieron sincronizar. Verifique su conexión.");
+      }
     } catch (err) {
-      console.error("Error sincronizando tablas relacionales:", err);
+      console.error("Error crítico sincronizando tablas relacionales:", err);
       showToast("error", "No se completó la sincronización con el servidor.");
     } finally {
       setFetching(false);

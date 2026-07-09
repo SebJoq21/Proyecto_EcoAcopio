@@ -11,8 +11,10 @@ const appendEmpresa = (path) => {
     const idEmpresa = user?.id_empresa;
     if (!idEmpresa) return path;
     
+    // ✅ SOLUCIÓN SONARQUBE: Sanitizar el idEmpresa antes de inyectarlo
+    const safeIdEmpresa = encodeURIComponent(idEmpresa);
     const conector = path.includes("?") ? "&" : "?";
-    return `${path}${conector}id_empresa=${idEmpresa}`;
+    return `${path}${conector}id_empresa=${safeIdEmpresa}`;
   } catch {
     return path;
   }
@@ -30,19 +32,17 @@ export const Api = {
   }),
 
   req: async (method, path, body) => {
-    // ✅ BYPASS DE CONTINGENCIA: Si la app pide el dashboard pero Express no tiene la ruta,
-    // devolvemos un objeto seguro simulado inmediatamente para que React pinte la interfaz limpia.
+    // ✅ BYPASS DE CONTINGENCIA
     if (path === "/dashboard" || path.startsWith("/dashboard?")) {
       console.warn("♻️ Interceptado /dashboard inexistente en Express. Retornando cascarón seguro.");
       return {
         total_stock: 0,
         transacciones_mes: 0,
         alertas: [],
-        items: [] // Añade aquí llaves vacías que use tu dashboard si es necesario
+        items: []
       };
     }
 
-    // El resto de la función se queda exactamente igual:
     const pathConEmpresa = appendEmpresa(path);
 
     const res = await fetch(`${BASE}${pathConEmpresa}`, {
@@ -75,30 +75,29 @@ export const Api = {
     Api.clearToken();
   },
 
-  // ✅ NUEVO: Endpoints para enlazar con la tabla categorias_materiales
   categorias: () => Api.req("GET", "/categorias"),
   crearCategoria: (body) => Api.req("POST", "/categorias", body),
 
-  // ✅ REVISADO: Envío limpio para la tabla materiales (espera id_categoria como UUID)
   materiales: (soloActivos = true) => Api.req("GET", `/materiales${soloActivos ? "?activos=true" : ""}`),
-  crearMaterial: (body) => Api.req("POST", "/materiales", body), // body ya llevará id_categoria
-  actualizarMaterial: (id, body) => Api.req("PUT", `/materiales/${id}`, body),
-  toggleMaterial: (id) => Api.req("POST", `/materiales/${id}/toggle`),
+  crearMaterial: (body) => Api.req("POST", "/materiales", body),
+  
+  // ✅ SOLUCIÓN SONARQUBE: Sanitizar los IDs en las rutas
+  actualizarMaterial: (id, body) => Api.req("PUT", `/materiales/${encodeURIComponent(id)}`, body),
+  toggleMaterial: (id) => Api.req("POST", `/materiales/${encodeURIComponent(id)}/toggle`),
 
-  // ✅ REVISADO: Envío limpio para la tabla pesajes
   pesajes: (qs = "") => Api.req("GET", `/pesajes${qs}`),
   registrarPesaje: (body) => Api.req("POST", "/pesajes", body),
   crearPesaje: (body) => Api.req("POST", "/pesajes", body),
 
   me: () => Api.req("GET", "/auth/me"),
   
-  // Rutas adaptadas automáticamente gracias a Api.req y appendEmpresa
   proveedores: () => Api.req("GET", "/proveedores"),
   crearProveedor: (body) => Api.req("POST", "/proveedores", body),
-  actualizarProveedor: (id, body) => Api.req("PUT", `/proveedores/${id}`, body),
-  inventario: (buscar = "") => Api.req("GET", `/inventario${buscar ? `?search=${buscar}` : ""}`),
   
-  // ✅ CONTINGENCIA PARA EL DASHBOARD INEXISTENTE (Evita el error HTML 404)
+  // ✅ SOLUCIÓN SONARQUBE: Sanitizar ID y parámetros de búsqueda
+  actualizarProveedor: (id, body) => Api.req("PUT", `/proveedores/${encodeURIComponent(id)}`, body),
+  inventario: (buscar = "") => Api.req("GET", `/inventario${buscar ? `?search=${encodeURIComponent(buscar)}` : ""}`),
+  
   dashboard: async () => {
     try {
       return await Api.req("GET", "/dashboard");
@@ -108,9 +107,12 @@ export const Api = {
     }
   },
   
-  reporte: (mes, anio) => Api.req("GET", `/cierres?mes=${mes}&anio=${anio}`),
+  // ✅ SOLUCIÓN SONARQUBE: Sanitizar los parámetros de la URL
+  reporte: (mes, anio) => Api.req("GET", `/cierres?mes=${encodeURIComponent(mes)}&anio=${encodeURIComponent(anio)}`),
+  
   exportarCSV: async (mes, anio) => {
-    const path = appendEmpresa(`/cierres/export?mes=${mes}&anio=${anio}`);
+    // ✅ SOLUCIÓN SONARQUBE: Sanitizar datos antes de construir la ruta de exportación
+    const path = appendEmpresa(`/cierres/export?mes=${encodeURIComponent(mes)}&anio=${encodeURIComponent(anio)}`);
     const res = await fetch(`${BASE}${path}`, {
       method: "GET",
       headers: Api.headers(),
@@ -121,6 +123,8 @@ export const Api = {
     }
     return await res.blob();
   },
-  auditoria: (limit = 100) => Api.req("GET", `/auditoria?limit=${limit}`),
+  
+  // ✅ SOLUCIÓN SONARQUBE: Sanitizar el límite
+  auditoria: (limit = 100) => Api.req("GET", `/auditoria?limit=${encodeURIComponent(limit)}`),
   analizarIA: (body) => Api.req("POST", "/scanner/analizar", body),
 };
