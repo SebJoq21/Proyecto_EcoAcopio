@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Api } from "../services/api";
 
 export default function ScannerPage({ app, showToast }) {
@@ -7,6 +7,8 @@ export default function ScannerPage({ app, showToast }) {
   const [imgB64, setImgB64] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const fileInputRef = useRef(null);
 
   const handleFile = (e) => {
     const f = e.target.files[0];
@@ -38,6 +40,21 @@ export default function ScannerPage({ app, showToast }) {
   const materialesSeguros = Array.isArray(app?.materiales) ? app.materiales : [];
   const guia = materialesSeguros.filter(m => m.activo).slice(0, 8);
 
+  // ✅ SOLUCIÓN SONARQUBE: Accesibilidad por teclado para el div clickeable
+  const handleScannerClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleScannerKeyDown = (e) => {
+    // Permite activar el input con las teclas Enter o Espacio
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleScannerClick();
+    }
+  };
+
   return (
     <div className="page">
       <div className="page-header">
@@ -51,14 +68,21 @@ export default function ScannerPage({ app, showToast }) {
             <div className="card-title">Descripción del Objeto / Imagen</div>
             
             <div className="form-group">
-              <label className="form-label">Describe el objeto o pega una imagen</label>
+              <label htmlFor="ai-desc" className="form-label">Describe el objeto o pega una imagen</label>
               <textarea className="form-textarea" id="ai-desc" placeholder="Ej: Botella de plástico transparente con etiqueta de papel..." style={{ minHeight: 100 }} value={desc} onChange={e => setDesc(e.target.value)} />
             </div>
             
-            <div className="scanner-area" onClick={() => document.getElementById("scan-file").click()}>
+            {/* ✅ SOLUCIÓN SONARQUBE: useRef y atributos a11y (role, tabIndex, onKeyDown) */}
+            <div 
+              className="scanner-area" 
+              onClick={handleScannerClick}
+              role="button"
+              tabIndex={0}
+              onKeyDown={handleScannerKeyDown}
+            >
               <span className="scanner-icon">📷</span>
               <p className="scanner-text">Toca para cargar foto del objeto<br /><small>o arrastra la imagen aquí</small></p>
-              <input type="file" id="scan-file" accept="image/*" style={{ display: "none" }} onChange={handleFile} />
+              <input type="file" id="scan-file" ref={fileInputRef} accept="image/*" style={{ display: "none" }} onChange={handleFile} />
             </div>
             
             {img && (
@@ -113,21 +137,25 @@ export default function ScannerPage({ app, showToast }) {
             <div className="card-title">Guía Rápida de Materiales</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {guia.map(m => {
-                // 1. Transformamos el precio de manera segura a número
-                const precioNumerico = parseFloat(m.precio || m.precio_referencial_kg || 0);
+                // ✅ SOLUCIÓN SONARQUBE: Validación robusta de NaN en parseFloat
+                const rawPrecio = Number.parseFloat(m.precio || m.precio_referencial_kg);
+                const precioNumerico = Number.isNaN(rawPrecio) ? 0 : rawPrecio;
 
-                // 2. 🛠️ SOLUCIÓN AL CRASH: Validamos si la categoría es un objeto o un texto plano
+                // Validación si la categoría es un objeto o un texto plano
                 let categoriaLegible = "—";
                 if (m.categoria) {
                   if (typeof m.categoria === "object" && m.categoria.nombre) {
-                    categoriaLegible = m.categoria.nombre; // Extrae el texto si el backend manda un objeto
+                    categoriaLegible = m.categoria.nombre; 
                   } else if (typeof m.categoria === "string") {
-                    categoriaLegible = m.categoria; // Usa la cadena si viene directa
+                    categoriaLegible = m.categoria; 
                   }
                 }
 
+                // ✅ SOLUCIÓN SONARQUBE: crypto.randomUUID() en lugar de Math.random()
+                const uniqueKey = m.id_material || m.id || crypto.randomUUID();
+
                 return (
-                  <div key={m.id_material || m.id || Math.random()} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: "1px solid var(--border)" }}>
+                  <div key={uniqueKey} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: "1px solid var(--border)" }}>
                     <span style={{ fontSize: 20 }}>{m.emoji || "♻️"}</span>
                     <div>
                       <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)" }}>{m.nombre}</div>
