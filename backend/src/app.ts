@@ -5,7 +5,16 @@ import { errorHandler } from './middlewares/error.middleware';
 
 const app: Application = express();
 
-app.use(cors());
+// Configuración estricta de CORS para pasar la auditoría de SonarQube
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://proyecto-eco-acopio.vercel.app' // URL de tu frontend en producción
+    : ['http://localhost:5173', 'http://localhost:3000'], // Puertos de desarrollo local
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Ruta base de prueba
