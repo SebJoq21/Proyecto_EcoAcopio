@@ -1,39 +1,46 @@
 // Lee la variable de entorno de Vite. Si no existe, apunta al puerto de Express (4000)
 const BASE = import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1";
 
-// Constructor nativo de URLs para evitar Inyección / SSRF
-const buildSafeUrl = (base, path) => {
-  const cleanBase = base.endsWith("/") ? base : `${base}/`;
+// ✅ SOLUCIÓN SONARQUBE: Uso avanzado de URL nativa para blindar contra SSRF
+const getSafeUrl = (path) => {
+  // Aseguramos que la base termine correctamente
+  const cleanBase = BASE.endsWith("/") ? BASE : `${BASE}/`;
+  // Quitamos la barra inicial para evitar que JS sobreescriba la ruta absoluta (Inyección de Host)
   const cleanPath = path.startsWith("/") ? path.slice(1) : path;
-  return new URL(cleanPath, cleanBase).toString();
+  
+  const urlObj = new URL(cleanPath, cleanBase);
+  
+  // Prevención definitiva de SSRF: Garantizamos que el origen final coincida con el servidor permitido
+  if (urlObj.origin !== new URL(cleanBase).origin) {
+    throw new Error("Bloqueo de seguridad: Origen de URL manipulado.");
+  }
+  
+  return urlObj;
 };
 
-// Función auxiliar interna para inyectar limpiamente el id_empresa en las URLs
-const appendEmpresa = (path) => {
-  try {
-    // REGLA DE EXCLUSIÓN: Si la ruta es de autenticación, no le inyectamos parámetros de tenant
-    if (path.startsWith("/auth")) return path;
+// ✅ SOLUCIÓN SONARQUBE: Manipulación segura de parámetros sin concatenar strings (Adiós Taint Analysis)
+const applyTenantSafe = (urlObj) => {
+  // REGLA DE EXCLUSIÓN: Si la ruta es de autenticación, no le inyectamos parámetros de tenant
+  if (urlObj.pathname.includes("/auth")) return urlObj;
 
+  try {
     const userStr = sessionStorage.getItem("eco_user");
-    if (!userStr) return path;
+    if (!userStr) return urlObj;
 
     const user = JSON.parse(userStr);
     const idEmpresa = user?.id_empresa;
     
-    // ✅ SOLUCIÓN SONARQUBE (Taint Analysis): Validación estructural estricta.
-    // Garantizamos que el ID proveniente del Storage solo contenga caracteres alfanuméricos y guiones (formato UUID).
-    // Si alguien inyecta "../" o código malicioso en el sessionStorage, esta regla lo bloquea.
-    if (!idEmpresa || !/^[a-zA-Z0-9-]+$/.test(String(idEmpresa))) {
-      return path; 
+    // Validación de estructura UUID estricta
+    if (idEmpresa && /^[a-zA-Z0-9-]+$/.test(String(idEmpresa))) {
+      // Usar searchParams.set es 100% confiable para SonarQube, sanitiza el input nativamente
+      // reemplazando por completo la necesidad de concatenar strings con "?" o "&"
+      urlObj.searchParams.set("id_empresa", String(idEmpresa));
     }
-    
-    const safeIdEmpresa = encodeURIComponent(String(idEmpresa));
-    const conector = path.includes("?") ? "&" : "?";
-    
-    return path + conector + "id_empresa=" + safeIdEmpresa;
   } catch {
-    return path;
+    // Fallo silencioso por seguridad
   }
+  
+  return urlObj;
 };
 
 export const Api = {
@@ -53,12 +60,13 @@ export const Api = {
       return { total_stock: 0, transacciones_mes: 0, alertas: [], items: [] };
     }
 
-    const pathConEmpresa = appendEmpresa(path);
-    
-    // Pasamos la ruta validada a nuestro constructor seguro
-    const finalUrl = buildSafeUrl(BASE, pathConEmpresa);
+    // 1. Construimos el objeto URL de forma segura
+    const baseUrlObj = getSafeUrl(path);
+    // 2. Inyectamos los parámetros del tenant usando la API segura
+    const finalUrlObj = applyTenantSafe(baseUrlObj);
 
-    const res = await fetch(finalUrl, {
+    // .toString() devuelve la URL perfectamente ensamblada y sanitizada por el navegador
+    const res = await fetch(finalUrlObj.toString(), {
       method, 
       headers: Api.headers(),
       ...(body ? { body: JSON.stringify(body) } : {}),
@@ -113,7 +121,7 @@ export const Api = {
     try {
       return await Api.req("GET", "/dashboard");
     } catch (e) {
-      // Retorno silencioso para evitar alertas S4792 (Hotspots de Consola) en SonarQube
+      // Retorno silencioso para evitar alertas de consola
       return { total_stock: 0, transacciones_mes: 0, alertas: [], items: [] };
     }
   },
@@ -121,12 +129,15 @@ export const Api = {
   reporte: (mes, anio) => Api.req("GET", "/cierres?mes=" + encodeURIComponent(String(mes)) + "&anio=" + encodeURIComponent(String(anio))),
   
   exportarCSV: async (mes, anio) => {
-    const path = appendEmpresa("/cierres/export?mes=" + encodeURIComponent(String(mes)) + "&anio=" + encodeURIComponent(String(anio)));
+    // ✅ En vez de concatenar todo en un string, armamos el objeto base y le seteamos las propiedades
+    const urlObj = getSafeUrl("/cierres/export");
     
-    // Construcción segura de la URL
-    const finalUrl = buildSafeUrl(BASE, path);
+    urlObj.searchParams.set("mes", String(mes));
+    urlObj.searchParams.set("anio", String(anio));
     
-    const res = await fetch(finalUrl, {
+    const finalUrlObj = applyTenantSafe(urlObj);
+    
+    const res = await fetch(finalUrlObj.toString(), {
       method: "GET",
       headers: Api.headers(),
     });
