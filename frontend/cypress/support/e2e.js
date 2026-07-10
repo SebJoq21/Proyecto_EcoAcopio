@@ -1,5 +1,10 @@
 import './commands';
 
+const safeParseFloat = (value) => {
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? 0 : parsed;
+};
+
 // Variables para simular persistencia en memoria durante la sesión de pruebas
 let mockCategorias = [
   { id_categoria: 'cat-uuid-001', nombre: 'Plásticos ♻️', fecha_creacion: '2026-06-26T20:00:00.000Z' },
@@ -104,15 +109,12 @@ beforeEach(() => {
 
   cy.intercept('POST', '**/api/v1/categorias*', (req) => {
     const nueva = {
-      id_categoria: 'cat-uuid-' + Math.floor(Math.random() * 1000),
+      id_categoria: 'cat-' + crypto.randomUUID(), // ✅ Solución SonarQube (ID Seguro)
       nombre: req.body.nombre,
       fecha_creacion: new Date().toISOString()
     };
     mockCategorias.push(nueva);
-    req.reply({
-      statusCode: 201,
-      body: nueva
-    });
+    req.reply({ statusCode: 201, body: nueva });
   }).as('crearCategoriaRequest');
 
   // Mock materials
@@ -123,20 +125,17 @@ beforeEach(() => {
   cy.intercept('POST', '**/api/v1/materiales*', (req) => {
     const cat = mockCategorias.find(c => c.id_categoria === req.body.id_categoria) || { nombre: 'Otros' };
     const nuevo = {
-      id_material: 'mat-uuid-' + Math.floor(Math.random() * 1000),
+      id_material: 'mat-' + crypto.randomUUID(), // ✅ Solución SonarQube (ID Seguro)
       etiqueta: req.body.etiqueta.toUpperCase(),
       nombre: req.body.nombre,
       id_categoria: req.body.id_categoria,
       categoria: { nombre: cat.nombre },
-      precio_referencial_kg: parseFloat(req.body.precio_referencial_kg),
+      precio_referencial_kg: safeParseFloat(req.body.precio_referencial_kg), // ✅ Solución SonarQube (Parse Seguro)
       activo: true,
       emoji: req.body.emoji || '📦'
     };
     mockMateriales.push(nuevo);
-    req.reply({
-      statusCode: 201,
-      body: nuevo
-    });
+    req.reply({ statusCode: 201, body: nuevo });
   }).as('crearMaterialRequest');
 
   // Mock providers
@@ -146,7 +145,7 @@ beforeEach(() => {
 
   cy.intercept('POST', '**/api/v1/proveedores*', (req) => {
     const nuevo = {
-      id_proveedor: 'prov-uuid-' + Math.floor(Math.random() * 1000),
+      id_proveedor: 'prov-' + crypto.randomUUID(), // ✅ Solución SonarQube (ID Seguro)
       nombre_completo: req.body.nombre_completo,
       numero_documento: req.body.numero_documento,
       tipo_documento: req.body.tipo_documento,
@@ -155,10 +154,7 @@ beforeEach(() => {
       total_transacciones: 0
     };
     mockProveedores.push(nuevo);
-    req.reply({
-      statusCode: 201,
-      body: nuevo
-    });
+    req.reply({ statusCode: 201, body: nuevo });
   }).as('crearProveedorRequest');
 
   // Mock inventory
@@ -169,7 +165,7 @@ beforeEach(() => {
       stocks[m.id_material] = 0;
     });
     mockPesajes.forEach(p => {
-      const peso = parseFloat(p.peso_kg || 0);
+      const peso = safeParseFloat(p.peso_kg); // ✅ Solución SonarQube (Parse Seguro)
       if (p.tipo_movimiento === 'COMPRA') {
         stocks[p.id_material] = (stocks[p.id_material] || 0) + peso;
       } else {
@@ -186,7 +182,7 @@ beforeEach(() => {
 
   // Mock dashboard
   cy.intercept('GET', '**/api/v1/dashboard*', (req) => {
-    const total = mockPesajes.reduce((acc, p) => acc + parseFloat(p.peso_kg || 0), 0);
+    const total = mockPesajes.reduce((acc, p) => acc + safeParseFloat(p.peso_kg), 0); // ✅ Solución SonarQube
     req.reply({
       total_stock: total,
       transacciones_mes: mockPesajes.length,
@@ -205,20 +201,17 @@ beforeEach(() => {
 
   cy.intercept('POST', '**/api/v1/pesajes*', (req) => {
     const nuevo = {
-      id_pesaje: 'pesaje-uuid-' + Math.floor(Math.random() * 1000),
+      id_pesaje: 'pesaje-' + crypto.randomUUID(), // ✅ Solución SonarQube (ID Seguro)
       tipo_movimiento: req.body.tipo_movimiento,
       id_material: req.body.id_material,
       id_proveedor: req.body.id_proveedor,
-      peso_kg: parseFloat(req.body.peso_kg),
-      precio_unitario: parseFloat(req.body.precio_unitario),
-      total_pagado: parseFloat(req.body.total_pagado),
+      peso_kg: safeParseFloat(req.body.peso_kg), // ✅ Solución SonarQube (Parse Seguro)
+      precio_unitario: safeParseFloat(req.body.precio_unitario), // ✅ Solución SonarQube (Parse Seguro)
+      total_pagado: safeParseFloat(req.body.total_pagado), // ✅ Solución SonarQube (Parse Seguro)
       fecha_creacion: new Date().toISOString()
     };
     mockPesajes.push(nuevo);
-    req.reply({
-      statusCode: 201,
-      body: nuevo
-    });
+    req.reply({ statusCode: 201, body: nuevo });
   }).as('crearPesajeRequest');
 
   // Mock scanner (IA)
