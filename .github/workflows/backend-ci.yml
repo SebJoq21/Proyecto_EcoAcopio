@@ -34,7 +34,8 @@ jobs:
 
       - name: 🧪 Ejecutar Pruebas Unitarias (Jest)
         working-directory: ./backend
-        # Este comando asume que tu compañera configurará "test": "jest --coverage" en el package.json
+        env:
+          DATABASE_URL: "postgresql://usuario:contrasena@localhost:5432/db_falsa"
         run: npm run test:coverage 
 
       - name: 🛡️ Escaneo de SonarCloud
