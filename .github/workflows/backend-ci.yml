@@ -28,6 +28,8 @@ jobs:
 
       - name: 🗄️ Generar cliente de Prisma
         working-directory: ./backend
+        env:
+          DATABASE_URL: "postgresql://usuario:contrasena@localhost:5432/db_falsa"
         run: npx prisma generate
 
       - name: 🧪 Ejecutar Pruebas Unitarias (Jest)
