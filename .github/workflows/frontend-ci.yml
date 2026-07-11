@@ -1,0 +1,37 @@
+name: Frontend CI/CD y Pruebas (Cypress)
+
+on:
+  push:
+    branches: [ "develop", "main" ]
+  pull_request:
+    branches: [ "develop", "main" ]
+
+jobs:
+  cypress-run:
+    name: Ejecutar Pruebas E2E
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Descargar el código
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: 📦 Instalar dependencias del frontend
+        working-directory: ./frontend
+        run: npm install
+
+      # Cypress tiene una acción oficial (cypress-io) que hace la magia de levantar Vite y correr los tests
+      - name: 🤖 Ejecutar Pruebas E2E (Cypress)
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: ./frontend
+          # 1. Levanta el servidor de Vite en la máquina virtual
+          start: npm run dev 
+          # 2. Cypress espera a que el puerto 5173 responda antes de empezar a probar
+          wait-on: 'http://localhost:5173' 
+          # Asegura que el navegador se ejecute en modo invisible (headless)
+          browser: chrome
