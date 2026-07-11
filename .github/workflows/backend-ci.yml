@@ -26,6 +26,10 @@ jobs:
         working-directory: ./backend
         run: npm install
 
+      - name: 🗄️ Generar cliente de Prisma
+        working-directory: ./backend
+        run: npx prisma generate
+
       - name: 🧪 Ejecutar Pruebas Unitarias (Jest)
         working-directory: ./backend
         # Este comando asume que tu compañera configurará "test": "jest --coverage" en el package.json
