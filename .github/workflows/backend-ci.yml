@@ -1,0 +1,45 @@
+name: Backend CI/CD y Pruebas
+
+on:
+  push:
+    branches: [ "develop", "main" ]
+  pull_request:
+    branches: [ "develop", "main" ]
+
+jobs:
+  test-and-scan:
+    name: Ejecutar Pruebas y SonarCloud
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Descargar el código
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: ⚙️ Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: 📦 Instalar dependencias
+        working-directory: ./backend
+        run: npm install
+
+      - name: 🗄️ Generar cliente de Prisma
+        working-directory: ./backend
+        env:
+          DATABASE_URL: "postgresql://usuario:contrasena@localhost:5432/db_falsa"
+        run: npx prisma generate
+
+      - name: 🧪 Ejecutar Pruebas Unitarias (Jest)
+        working-directory: ./backend
+        env:
+          DATABASE_URL: "postgresql://usuario:contrasena@localhost:5432/db_falsa"
+        run: npm run test:coverage 
+
+      - name: 🛡️ Escaneo de SonarCloud
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
