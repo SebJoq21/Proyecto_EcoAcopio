@@ -25,6 +25,7 @@ export default function App() {
   const [role, setRole] = useState(null);
   const [page, setPage] = useState("landing");
   const [authTab, setAuthTab] = useState("login");
+  const [authLoading, setAuthLoading] = useState(true);
   const [app, setApp] = useState({ materiales: [], proveedores: [], role: null });
   const { toasts, show: showToast } = useToast();
   const clock = useClock();
@@ -39,7 +40,13 @@ export default function App() {
         setApp(a => ({ ...a, role: u.rol }));
         setPage("dashboard");
         cargarDatos();
-      }).catch(() => Api.clearToken());
+        setAuthLoading(false);
+      }).catch(() => {
+        Api.clearToken();
+        setAuthLoading(false);
+      });
+    } else {
+      setAuthLoading(false);
     }
   }, []);
 
@@ -127,9 +134,9 @@ export default function App() {
     { id: "inventario", icon: "📦", label: "Inventario", section: "Principal" },
     { id: "scanner", icon: "🤖", label: "Escáner IA", section: "Principal" },
     { id: "categorias", icon: "🏷️", label: "Categorías", section: "Gestión", adminOnly: true },
+    { id: "materiales", icon: "🏷️", label: "Lista Maestra", section: "Gestión", adminOnly: true },
     { id: "proveedores", icon: "👥", label: "Proveedores", section: "Gestión" },
     { id: "reportes", icon: "📋", label: "Reportes", section: "Gestión", adminOnly: true },
-    { id: "materiales", icon: "🏷️", label: "Lista Maestra", section: "Gestión", adminOnly: true },
     { id: "auditoria", icon: "🔍", label: "Auditoría", section: "Gestión", adminOnly: true },
   ];
 
@@ -152,6 +159,12 @@ export default function App() {
 
   return (
     <>
+      {authLoading ? (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', background: 'var(--bg0)' }}>
+          <span className="spinner" style={{ width: 24, height: 24, borderWidth: 3 }} />
+        </div>
+      ) : (
+      <>
       {!user && (page === "landing" || page === "auth") && <LandingPage onNavigate={handleNavigate} />}
 
       {!user && page === "auth" && (
@@ -173,6 +186,7 @@ export default function App() {
 
       {user && (
         <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+          {!isConfigPage && (
           <div className="topbar">
             <div className="logo">
               <div className="logo-icon">♻️</div>
@@ -224,6 +238,7 @@ export default function App() {
 
             <button onClick={handleLogout} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", fontSize: 16, padding: "4px 8px", borderRadius: "6px" }} title="Cerrar sesión">↩</button>
           </div>
+          )}
 
           <div className="layout">
             {!isConfigPage && (
@@ -262,6 +277,8 @@ export default function App() {
       )}
 
       <ToastContainer toasts={toasts} />
+    </>
+      )}
     </>
   );
 }
