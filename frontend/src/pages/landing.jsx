@@ -174,6 +174,47 @@ export default function Landing({ onNavigate }) {
           transform: rotate(75deg);
           bottom: 30px; left: 220px;
         }
+
+        @media (max-width: 1024px) {
+          .testimonio-card { width: 300px; min-width: 300px; }
+          @keyframes carruselTestimonios {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-300px * 5 - 24px * 5)); }
+          }
+          .hero-section-clear { padding: 60px 0; }
+          .glass-section { padding: 60px 0; }
+          .plant-left { bottom: -30px; left: -30px; transform: scale(0.7); }
+          .plant-right { top: 10%; right: -60px; transform: scale(0.7); }
+          .plant-middle { transform: scale(0.45); }
+        }
+
+        @media (max-width: 768px) {
+          .testimonio-card { width: 280px; min-width: 280px; }
+          @keyframes carruselTestimonios {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-280px * 5 - 24px * 5)); }
+          }
+          .paso-card { padding: 28px 18px; }
+          .hero-section-clear { padding: 40px 0; }
+          .glass-section { padding: 40px 0; }
+          .eco-landing-wrapper { background-size: 20px 20px; }
+          .plant-left { bottom: -20px; left: -30px; transform: scale(0.45); }
+          .plant-right { transform: scale(0.45); }
+          .plant-middle { display: none; }
+        }
+
+        @media (max-width: 480px) {
+          .testimonio-card { width: 260px; min-width: 260px; }
+          @keyframes carruselTestimonios {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-260px * 5 - 24px * 5)); }
+          }
+          .paso-card { padding: 24px 14px; }
+          .hero-section-clear { padding: 32px 0; }
+          .glass-section { padding: 32px 0; }
+          .plant-left { display: none; }
+          .plant-right { display: none; }
+        }
       `}</style>
       <div className="eco-landing-wrapper landing">
         <div className="css-plant plant-left">

@@ -76,7 +76,7 @@ export default function ProveedoresPage({ showToast, onRefresh }) {
         <p style={{ color: "var(--text3)", margin: "4px 0 0 0" }}>Directorio oficial de entidades y control de transacciones de acopio</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 2.2fr", gap: 24 }}>
+      <div className="grid-form">
         {/* Formulario */}
         <div className="card" style={{ padding: 24, height: "fit-content" }}>
           <h2 style={{ fontSize: 18, marginTop: 0, marginBottom: 16 }}>Nuevo Registro</h2>

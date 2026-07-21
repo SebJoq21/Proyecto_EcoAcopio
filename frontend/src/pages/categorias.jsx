@@ -60,7 +60,7 @@ export default function CategoriasPage({ showToast }) {
         <p style={{ color: "var(--text3)", margin: "4px 0 0 0" }}>Configuración del catálogo maestro para segmentación de residuos</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 24 }}>
+      <div className="grid-form">
         {/* Formulario de Creación */}
         <div className="card" style={{ padding: 24, height: "fit-content" }}>
           <h2 style={{ fontSize: 18, marginTop: 0, marginBottom: 16 }}>Nueva Categoría</h2>

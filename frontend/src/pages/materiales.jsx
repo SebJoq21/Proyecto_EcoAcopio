@@ -98,7 +98,7 @@ export default function MaterialesPage({ showToast, onRefresh }) {
         <p style={{ color: "var(--text3)", margin: "4px 0 0 0" }}>Definición de precios de referencia y catálogos de valorización</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 2.5fr", gap: 24 }}>
+      <div className="grid-form">
         
         {/* Formulario de Alta de Material */}
         <div className="card" style={{ padding: 24, height: "fit-content" }}>
