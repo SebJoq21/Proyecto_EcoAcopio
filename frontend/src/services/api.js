@@ -113,8 +113,12 @@ export const Api = {
   
   proveedores: () => Api.req("GET", "/proveedores"),
   crearProveedor: (body) => Api.req("POST", "/proveedores", body),
-  
   actualizarProveedor: (id, body) => Api.req("PUT", "/proveedores/" + encodeURIComponent(String(id)), body),
+  
+  // --- MÓDULO FINANCIERO (ESTADOS DE CUENTA) ---
+  estadoCuenta: (id_proveedor) => Api.req("GET", "/cuentas/" + encodeURIComponent(String(id_proveedor))),
+  registrarMovimiento: (body) => Api.req("POST", "/cuentas", body),
+  
   inventario: (buscar = "") => Api.req("GET", "/inventario" + (buscar ? "?search=" + encodeURIComponent(String(buscar)) : "")),
   
   dashboard: async () => {
