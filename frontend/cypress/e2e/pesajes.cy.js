@@ -55,6 +55,6 @@ describe('Registro de Pesajes en Balanza', () => {
 
     // Validar que se liste en la tabla de Últimos Pesajes del Turno Activo
     cy.contains('td', '120.0 kg').should('exist');
-    cy.contains('td', 'S/. 264.00').should('exist'); // 120 * 2.20 = 264.00
+    cy.contains('td', 'S/. 300.00').should('exist'); // 120 kg * 2.50 = 300.00
   });
 });
