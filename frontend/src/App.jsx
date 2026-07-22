@@ -246,6 +246,7 @@ export default function App() {
           <div className="layout">
             {!isConfigPage && (
               <nav className="sidebar">
+                <div className="sidebar-nav">
                 {["Principal", "Gestión"].map(section => {
                   const items = navItems.filter(n => n.section === section && (!n.adminOnly || isAdmin));
                   if (items.length === 0) return null;
@@ -262,6 +263,7 @@ export default function App() {
                     </div>
                   );
                 })}
+                </div>
                 <div className="sidebar-footer">
                   <div className="sidebar-stat">
                     <div className="sidebar-stat-label">STOCK TOTAL HOY</div>
