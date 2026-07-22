@@ -32,9 +32,9 @@ describe('Registro de Pesajes en Balanza', () => {
     // El dropdown de materiales específicos se habilita y cargamos el primero
     cy.get('select').eq(2).should('not.be.disabled').select(1);
 
-    // 3. Completar Peso y Precio Unitario
+    // 3. Completar Peso y verificar Precio Unitario autocompletado
     cy.get('input[type="number"]').eq(0).clear().type('120'); // 120 kg
-    cy.get('input[type="number"]').eq(1).clear().type('2.20'); // S/. 2.20 por kg
+    cy.get('input[type="number"]').eq(1).should('have.attr', 'readonly'); // Precio autocompletado, solo lectura
 
     // Opcional: escribir observaciones
     cy.get('input[placeholder="Mermas, estado de humedad..."]').type('Prueba automatizada de báscula');
