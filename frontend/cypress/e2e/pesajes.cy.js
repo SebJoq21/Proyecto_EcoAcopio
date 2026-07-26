@@ -32,9 +32,9 @@ describe('Registro de Pesajes en Balanza', () => {
     // El dropdown de materiales específicos se habilita y cargamos el primero
     cy.get('select').eq(2).should('not.be.disabled').select(1);
 
-    // 3. Completar Peso y Precio Unitario
+    // 3. Completar Peso y verificar Precio Unitario autocompletado
     cy.get('input[type="number"]').eq(0).clear().type('120'); // 120 kg
-    cy.get('input[type="number"]').eq(1).clear().type('2.20'); // S/. 2.20 por kg
+    cy.get('input[type="number"]').eq(1).should('have.attr', 'readonly'); // Precio autocompletado, solo lectura
 
     // Opcional: escribir observaciones
     cy.get('input[placeholder="Mermas, estado de humedad..."]').type('Prueba automatizada de báscula');
@@ -55,6 +55,6 @@ describe('Registro de Pesajes en Balanza', () => {
 
     // Validar que se liste en la tabla de Últimos Pesajes del Turno Activo
     cy.contains('td', '120.0 kg').should('exist');
-    cy.contains('td', 'S/. 264.00').should('exist'); // 120 * 2.20 = 264.00
+    cy.contains('td', 'S/. 300.00').should('exist'); // 120 kg * 2.50 = 300.00
   });
 });

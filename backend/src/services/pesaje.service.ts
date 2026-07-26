@@ -1,5 +1,6 @@
 import { pesajeRepository } from '../repositories/pesaje.repository';
 import { CreatePesajeDTO, UpdatePesajeDTO } from '../types/pesaje.dto';
+import { TipoMovimientoFinanciero } from '@prisma/client';
 import prisma from '../config/prisma';
 
 export class PesajeService {
@@ -14,10 +15,10 @@ export class PesajeService {
   }
 
   async createPesaje(data: CreatePesajeDTO) {
-    // Iniciamos una TRANSACCIÓN ACID: O se guarda el pesaje y el inventario juntos, o no se guarda nada.
+    const valor_total = Number((data.peso_kg * data.precio_unitario).toFixed(2));
+
     return await prisma.$transaction(async (tx) => {
       
-      // 1. Buscamos si la empresa ya tiene un registro de inventario para este material
       const inventarioActual = await tx.inventario.findFirst({
         where: {
           id_empresa: data.id_empresa,
@@ -25,52 +26,83 @@ export class PesajeService {
         }
       });
 
-      // 2. Evaluamos la regla de negocio según el tipo de movimiento
-      const esCompra = data.tipo_movimiento.toUpperCase() === 'COMPRA';
-      const esVenta = data.tipo_movimiento.toUpperCase() === 'VENTA';
+      const esCompra = data.tipo_movimiento.toUpperCase() === 'COMPRA' || data.tipo_movimiento.toUpperCase() === 'ENTRADA';
+      const esVenta = data.tipo_movimiento.toUpperCase() === 'VENTA' || data.tipo_movimiento.toUpperCase() === 'SALIDA';
 
       if (!esCompra && !esVenta) {
-        throw new Error('El tipo de movimiento debe ser COMPRA o VENTA');
+        throw new Error('El tipo de movimiento debe ser COMPRA/ENTRADA o VENTA/SALIDA');
       }
 
       if (inventarioActual) {
-        // REGLA: Si es venta, verificar que haya suficiente stock para no quedar en negativo
         if (esVenta && Number(inventarioActual.stock_kg) < data.peso_kg) {
           throw new Error(`Stock insuficiente. Intentas vender ${data.peso_kg}kg pero solo hay ${inventarioActual.stock_kg}kg disponibles.`);
         }
 
-        // 3a. Actualizamos el inventario existente sumando o restando los kilos
         const variacionPeso = esCompra ? data.peso_kg : -data.peso_kg;
         
         await tx.inventario.update({
           where: { id_inventario: inventarioActual.id_inventario },
           data: {
-            // Prisma tiene la función atómica 'increment' que sirve tanto para sumar como para restar (si es negativo)
             stock_kg: { increment: variacionPeso } 
           }
         });
         
       } else {
-        // REGLA: No se puede vender algo que nunca se ha comprado
         if (esVenta) {
           throw new Error('No puedes registrar una VENTA de un material que no existe en tu inventario.');
         }
 
-        // 3b. Como es la primera vez que se compra este material, creamos su fila de inventario desde cero
         await tx.inventario.create({
           data: {
             id_empresa: data.id_empresa,
             id_material: data.id_material,
             stock_kg: data.peso_kg
-            // stock_minimo_kg tomará su valor por defecto de 0.00 según tu schema
           }
         });
       }
 
-      // 4. Finalmente, ya con el inventario cuadrado, creamos el ticket de pesaje
       const nuevoPesaje = await tx.pesaje.create({
-        data
+        data: { ...data, valor_total }
       });
+
+      if (esCompra && data.id_proveedor) {
+        await tx.cuentaCorriente.create({
+          data: {
+            id_empresa: data.id_empresa,
+            id_proveedor: data.id_proveedor,
+            id_usuario: data.id_usuario,
+            id_pesaje: nuevoPesaje.id_pesaje,
+            tipo_movimiento: TipoMovimientoFinanciero.CARGO,
+            monto: valor_total,
+            concepto: 'Ingreso de material',
+          },
+        });
+
+        await tx.proveedor.update({
+          where: { id_provider: data.id_proveedor },
+          data: { saldo_actual: { increment: valor_total } },
+        });
+
+        const totalPagado = Number(data.total_pagado || 0);
+        if (totalPagado > 0) {
+          await tx.cuentaCorriente.create({
+            data: {
+              id_empresa: data.id_empresa,
+              id_proveedor: data.id_proveedor,
+              id_usuario: data.id_usuario,
+              id_pesaje: nuevoPesaje.id_pesaje,
+              tipo_movimiento: TipoMovimientoFinanciero.ABONO,
+              monto: totalPagado,
+              concepto: 'Pago en efectivo por pesaje',
+            },
+          });
+
+          await tx.proveedor.update({
+            where: { id_provider: data.id_proveedor },
+            data: { saldo_actual: { decrement: totalPagado } },
+          });
+        }
+      }
 
       return nuevoPesaje;
     });

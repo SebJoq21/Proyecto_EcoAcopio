@@ -13,13 +13,13 @@ const getBadgeStyle = (accion) => {
 
   switch (accion) {
     case 'CREAR':
-      return { ...baseStyle, backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.2)' };
+      return { ...baseStyle, background: 'var(--green-bg)', color: 'var(--green)', border: '1px solid var(--green-border)' };
     case 'ACTUALIZAR':
-      return { ...baseStyle, backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.2)' };
+      return { ...baseStyle, background: 'var(--blue-bg)', color: 'var(--blue)', border: '1px solid var(--blue-border)' };
     case 'ELIMINAR':
-      return { ...baseStyle, backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)' };
+      return { ...baseStyle, background: 'var(--red-bg)', color: 'var(--red)', border: '1px solid var(--red-border)' };
     default:
-      return { ...baseStyle, backgroundColor: 'rgba(100, 116, 139, 0.1)', color: '#94a3b8', border: '1px solid rgba(100, 116, 139, 0.2)' };
+      return { ...baseStyle, background: 'var(--bg3)', color: 'var(--text2)', border: '1px solid var(--border)' };
   }
 };
 
@@ -64,9 +64,9 @@ export default function AuditoriaPage({ app, showToast }) {
         <p className="page-sub">Registro inmutable de todas las modificaciones — RN-12</p>
       </div>
       
-      <div className="grid-21">
+      <div className="grid-21" style={{ alignItems: "flex-start" }}>
         {/* COLUMNA IZQUIERDA: HISTORIAL */}
-        <div className="card">
+        <div className="card" style={{ maxHeight: "calc(100vh - 220px)", overflowY: "auto", scrollbarWidth: "thin", scrollbarColor: "var(--text3) transparent" }}>
           <div className="card-title">Historial de Cambios</div>
           
           {cargando ? (
@@ -87,7 +87,7 @@ export default function AuditoriaPage({ app, showToast }) {
                     alignItems: 'center', 
                     justifyContent: 'space-between', 
                     padding: '16px', 
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+                    borderBottom: '1px solid var(--border)'
                   }}
                 >
                   {/* Lado Izquierdo: Badge y Textos */}
@@ -97,21 +97,21 @@ export default function AuditoriaPage({ app, showToast }) {
                     </span>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span style={{ fontSize: '14px', fontWeight: '500', color: '#f8fafc' }}>
+                      <span style={{ fontSize: '14px', fontWeight: '500', color: 'var(--text1)' }}>
                         {log.usuario?.nombres} {log.usuario?.apellidos}
                       </span>
-                      <span style={{ fontSize: '12px', color: '#94a3b8' }}>
-                        modificó el registro de <span style={{ fontWeight: '600', color: '#cbd5e1' }}>{log.entidad}</span>
+                      <span style={{ fontSize: '12px', color: 'var(--text2)' }}>
+                        modificó el registro de <span style={{ fontWeight: '600', color: 'var(--text1)' }}>{log.entidad}</span>
                       </span>
                     </div>
                   </div>
 
                   {/* Lado Derecho: Fecha y Hora */}
                   <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <span style={{ fontSize: '13px', color: '#cbd5e1' }}>
+                    <span style={{ fontSize: '13px', color: 'var(--text2)' }}>
                       {new Date(log.fecha_creacion).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </span>
-                    <span style={{ fontSize: '11px', color: '#64748b' }}>
+                    <span style={{ fontSize: '11px', color: 'var(--text3)' }}>
                       {new Date(log.fecha_creacion).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                     </span>
                   </div>
@@ -122,7 +122,7 @@ export default function AuditoriaPage({ app, showToast }) {
         </div>
 
         {/* COLUMNA DERECHA: RESUMEN */}
-        <div className="card">
+        <div className="card" style={{ position: "sticky", top: 24 }}>
           <div className="card-title">Resumen de Actividad</div>
           {!cargando && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

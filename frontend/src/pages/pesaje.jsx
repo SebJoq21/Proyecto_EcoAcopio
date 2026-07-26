@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Api } from "../services/api";
 import { obtenerEmojiPorDefecto } from "../utils/emojis";
 
@@ -8,6 +8,7 @@ export default function PesajePage({ app, showToast, onRefresh }) {
   const [materialesTodos, setMaterialesTodos] = useState([]);
   const [proveedores, setProveedores] = useState([]);
   const [ultimosPesajes, setUltimosPesajes] = useState([]);
+  const [inventario, setInventario] = useState([]);
   const [fetching, setFetching] = useState(false);
 
   // Filtros de categorías
@@ -21,10 +22,12 @@ export default function PesajePage({ app, showToast, onRefresh }) {
     id_proveedor: "",
     peso_kg: "",
     precio_unitario: "",
+    monto_pagado: "",
     observaciones: ""
   });
 
   const [guardando, setGuardando] = useState(false);
+  const montoPagadoManual = useRef(false);
 
   // Carga e integración local de catálogos atómicos
   // ✅ SOLUCIÓN SONARQUBE: Envolver en useCallback para dependencias seguras
@@ -35,10 +38,11 @@ export default function PesajePage({ app, showToast, onRefresh }) {
         Api.categorias(),
         Api.materiales(true),
         Api.proveedores(),
-        Api.pesajes(`?limit=10`)
+        Api.pesajes(`?limit=10`),
+        Api.inventario()
       ]);
 
-      const [rCats, rMats, rProvs, rPesajes] = resultados;
+      const [rCats, rMats, rProvs, rPesajes, rInv] = resultados;
 
       if (rCats.status === "fulfilled") {
         setCategorias(Array.isArray(rCats.value) ? rCats.value : []);
@@ -67,6 +71,13 @@ export default function PesajePage({ app, showToast, onRefresh }) {
       } else {
         console.error("Error al cargar pesajes:", rPesajes.reason);
         setUltimosPesajes([]);
+      }
+
+      if (rInv.status === "fulfilled") {
+        setInventario(Array.isArray(rInv.value) ? rInv.value : (rInv.value?.items || []));
+      } else {
+        console.error("Error al cargar inventario:", rInv.reason);
+        setInventario([]);
       }
 
       const algunaFallo = resultados.some(r => r.status === "rejected");
@@ -111,6 +122,24 @@ export default function PesajePage({ app, showToast, onRefresh }) {
   // Cálculo en tiempo real de la liquidación monetaria (Masa * Precio)
   const totalEstimado = (Number.parseFloat(formulario.peso_kg) || 0) * (Number.parseFloat(formulario.precio_unitario) || 0);
 
+  const materialSeleccionado = materialesTodos.find(
+    (m) => String(m.id_material) === String(formulario.id_material)
+  );
+  const itemInventario = inventario.find(
+    (i) => String(i.id_material) === String(formulario.id_material)
+  );
+  const stockDisponible = Number(itemInventario?.stock_neto || itemInventario?.stock || itemInventario?.stock_kg || 0);
+  const esVenta = formulario.tipo_movimiento.toUpperCase() === "VENTA" || formulario.tipo_movimiento.toUpperCase() === "SALIDA";
+  const pesoIngresado = Number.parseFloat(formulario.peso_kg) || 0;
+  const stockExcedido = esVenta && pesoIngresado > stockDisponible;
+
+  // Auto-llenar monto pagado con el total estimado si el usuario no lo ha editado manualmente
+  useEffect(() => {
+    if (!montoPagadoManual.current && totalEstimado > 0) {
+      setFormulario((prev) => ({ ...prev, monto_pagado: totalEstimado.toFixed(2) }));
+    }
+  }, [totalEstimado]);
+
   // Registro transaccional en caliente
   const registrarTicket = async (e) => {
     e.preventDefault();
@@ -124,15 +153,29 @@ export default function PesajePage({ app, showToast, onRefresh }) {
       return;
     }
 
+    if (stockExcedido) {
+      showToast?.("error", `No hay suficiente stock para realizar esta venta. Stock disponible: ${stockDisponible.toFixed(2)} kg`);
+      return;
+    }
+
+    const montoPagado = Number.parseFloat(formulario.monto_pagado) || 0;
+    if (montoPagado > totalEstimado) {
+      showToast("error", `El monto pagado (S/ ${montoPagado.toFixed(2)}) no puede superar el total de la compra (S/ ${totalEstimado.toFixed(2)}).`);
+      return;
+    }
+
     try {
       setGuardando(true);
       const payload = {
-        ...formulario,
+        tipo_movimiento: formulario.tipo_movimiento,
+        id_material: formulario.id_material,
+        id_proveedor: formulario.id_proveedor,
         id_empresa: Api.getUser()?.id_empresa,
         id_usuario: Api.getUser()?.id_usuario,
         peso_kg: Number.parseFloat(formulario.peso_kg),
         precio_unitario: Number.parseFloat(formulario.precio_unitario),
-        total_pagado: totalEstimado,
+        total_pagado: montoPagado,
+        observaciones: formulario.observaciones,
         estado: "Completado"
       };
 
@@ -146,9 +189,11 @@ export default function PesajePage({ app, showToast, onRefresh }) {
         id_proveedor: "",
         peso_kg: "",
         precio_unitario: "",
+        monto_pagado: "",
         observaciones: ""
       });
       setCategoriaSeleccionada("");
+      montoPagadoManual.current = false;
       
       cargarCatalogos();
       if (onRefresh) onRefresh();
@@ -241,14 +286,40 @@ export default function PesajePage({ app, showToast, onRefresh }) {
 
             <div className="grid-2" style={{ gap: 12, padding: 0 }}>
               <div className="form-group">
-                <label htmlFor="peso_kg" className="form-label">Volumen Físico (Kilogramos) *</label>
+                <label htmlFor="peso_kg" className="form-label" style={stockExcedido ? { color: "var(--red)" } : undefined}>
+                  {formulario.id_material
+                    ? `📦 Stock disponible: ${stockDisponible.toFixed(2)} kg`
+                    : "📦 Volumen a registrar (kg)"} <span className="req">*</span>
+                </label>
                 <input id="peso_kg" type="number" step="0.01" className="form-input" placeholder="0.00" value={formulario.peso_kg} onChange={(e) => setFormulario({ ...formulario, peso_kg: e.target.value })} required />
               </div>
 
               <div className="form-group">
                 <label htmlFor="precio_unitario" className="form-label">Precio pactado por Kg (S/.) *</label>
-                <input id="precio_unitario" type="number" step="0.01" className="form-input" placeholder="0.00" value={formulario.precio_unitario} onChange={(e) => setFormulario({ ...formulario, precio_unitario: e.target.value })} required />
+                <input id="precio_unitario" type="number" step="0.01" className="form-input" placeholder="0.00" value={formulario.precio_unitario} readOnly style={{ background: "var(--bg3)", cursor: "not-allowed", opacity: 0.75 }} />
               </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="monto_pagado" className="form-label">Monto Pagado Hoy (S/)</label>
+              <input
+                id="monto_pagado"
+                type="number"
+                step="0.01"
+                min="0"
+                className="form-input"
+                placeholder="0.00"
+                value={formulario.monto_pagado}
+                onChange={(e) => {
+                  montoPagadoManual.current = true;
+                  setFormulario({ ...formulario, monto_pagado: e.target.value });
+                }}
+              />
+              {Number.parseFloat(formulario.monto_pagado) > 0 && Number.parseFloat(formulario.monto_pagado) < totalEstimado && (
+                <div className="form-hint">
+                  Saldo pendiente: S/ {(totalEstimado - Number.parseFloat(formulario.monto_pagado)).toFixed(2)} quedaran como deuda del proveedor
+                </div>
+              )}
             </div>
 
             <div className="form-group">

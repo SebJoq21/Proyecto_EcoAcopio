@@ -19,6 +19,7 @@ import MaterialesPage from "./pages/materiales";
 import AuditoriaPage from "./pages/auditoria";
 import ConfiguracionPage from "./pages/configuracion";
 import ScannerPage from "./pages/scanner";
+import EstadoCuentasPage from './pages/estadoCuentas';
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -136,6 +137,7 @@ export default function App() {
     { id: "categorias", icon: "🏷️", label: "Categorías", section: "Gestión", adminOnly: true },
     { id: "materiales", icon: "🏷️", label: "Lista Maestra", section: "Gestión", adminOnly: true },
     { id: "proveedores", icon: "👥", label: "Proveedores", section: "Gestión" },
+    { id: "estadoCuentas", label: "Estado de Cuentas", icon: "📒", section: "Gestión", adminOnly: true },
     { id: "reportes", icon: "📋", label: "Reportes", section: "Gestión", adminOnly: true },
     { id: "auditoria", icon: "🔍", label: "Auditoría", section: "Gestión", adminOnly: true },
   ];
@@ -149,6 +151,7 @@ export default function App() {
       case "categorias": return <CategoriasPage showToast={showToast} />;
       case "proveedores": return <ProveedoresPage {...props} />;
       case "reportes": return <ReportesPage {...props} />;
+      case "estadoCuentas": return <EstadoCuentasPage />;
       case "materiales": return <MaterialesPage {...props} />;
       case "auditoria": return <AuditoriaPage {...props} />;
       case "configuracion": return <ConfiguracionPage {...props} />;
@@ -243,6 +246,7 @@ export default function App() {
           <div className="layout">
             {!isConfigPage && (
               <nav className="sidebar">
+                <div className="sidebar-nav">
                 {["Principal", "Gestión"].map(section => {
                   const items = navItems.filter(n => n.section === section && (!n.adminOnly || isAdmin));
                   if (items.length === 0) return null;
@@ -259,6 +263,7 @@ export default function App() {
                     </div>
                   );
                 })}
+                </div>
                 <div className="sidebar-footer">
                   <div className="sidebar-stat">
                     <div className="sidebar-stat-label">STOCK TOTAL HOY</div>

@@ -9,6 +9,7 @@ import inventarioRoutes from './inventario.routes';
 import cierreRoutes from './cierre.routes';
 import auditoriaRoutes from './auditoria.routes';
 import authRoutes from './auth.routes';
+import cuentasRoutes from './cuentas.routes'; 
 import { verifyAuth } from '../middlewares/auth.middleware';
 import { verifyTenant } from '../middlewares/tenant.middleware';
 
@@ -24,5 +25,6 @@ router.use('/inventario', verifyAuth, verifyTenant, inventarioRoutes);
 router.use('/cierres', verifyAuth, verifyTenant, cierreRoutes);
 router.use('/auditoria', verifyAuth, verifyTenant, auditoriaRoutes);
 router.use('/auth', authRoutes);
+router.use('/cuentas', verifyAuth, verifyTenant, cuentasRoutes); 
 
 export default router;

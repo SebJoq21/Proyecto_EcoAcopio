@@ -113,6 +113,8 @@ body { display: flex; flex-direction: column; }
 /* ===== LAYOUT & SIDEBAR ===== */
 .layout { display: flex; flex: 1; overflow: hidden; }
 .sidebar { width: 220px; flex-shrink: 0; background: var(--bg1); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; transition: width .25s ease; }
+.sidebar-nav { flex: 1; overflow-y: auto; overflow-x: hidden; padding-bottom: 8px; scrollbar-width: none; }
+.sidebar-nav::-webkit-scrollbar { display: none; }
 .sidebar-section { padding: 14px 12px 6px; }
 .sidebar-label { font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; padding: 0 4px; margin-bottom: 4px; }
 .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--r-sm); cursor: pointer; transition: background .12s; color: var(--text2); font-size: 14px; font-weight: 400; margin-bottom: 2px; position: relative; user-select: none; }

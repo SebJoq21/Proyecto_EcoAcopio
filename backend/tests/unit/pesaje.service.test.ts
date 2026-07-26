@@ -32,6 +32,12 @@ const mockTx = {
     create: jest.fn(),
     update: jest.fn(),
   },
+  cuentaCorriente: {
+    create: jest.fn().mockResolvedValue({}),
+  },
+  proveedor: {
+    update: jest.fn().mockResolvedValue({}),
+  },
 };
 
 describe('PesajeService', () => {
@@ -79,6 +85,7 @@ describe('PesajeService', () => {
       id_proveedor: 'proveedor-123',
       id_usuario: 'usuario-123',
       peso_kg: 50.00,
+      precio_unitario: 2.00,
       total_pagado: 100.00,
       tipo_movimiento: 'COMPRA',
     };
@@ -89,7 +96,7 @@ describe('PesajeService', () => {
 
       await expect(pesajeService.createPesaje(invalidDto))
         .rejects
-        .toThrow('El tipo de movimiento debe ser COMPRA o VENTA');
+        .toThrow('El tipo de movimiento debe ser COMPRA/ENTRADA o VENTA/SALIDA');
     });
 
     it('debería registrar una COMPRA y actualizar el inventario existente', async () => {
@@ -109,7 +116,7 @@ describe('PesajeService', () => {
         where: { id_inventario: 'inv-1' },
         data: { stock_kg: { increment: 50.00 } },
       });
-      expect(mockTx.pesaje.create).toHaveBeenCalledWith({ data: pesajeDto });
+      expect(mockTx.pesaje.create).toHaveBeenCalledWith({ data: { ...pesajeDto, valor_total: 100.00 } });
       expect(result).toEqual(expectedPesaje);
     });
 
@@ -129,7 +136,7 @@ describe('PesajeService', () => {
           stock_kg: 50.00,
         },
       });
-      expect(mockTx.pesaje.create).toHaveBeenCalledWith({ data: pesajeDto });
+      expect(mockTx.pesaje.create).toHaveBeenCalledWith({ data: { ...pesajeDto, valor_total: 100.00 } });
       expect(result).toEqual(expectedPesaje);
     });
 

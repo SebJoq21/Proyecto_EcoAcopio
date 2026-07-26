@@ -7,6 +7,21 @@ datasource db {
 }
 
 // =============================================================================
+// ENUMS
+// =============================================================================
+
+enum AccionAuditoria {
+  CREAR
+  ACTUALIZAR
+  ELIMINAR
+}
+
+enum TipoMovimientoFinanciero {
+  CARGO
+  ABONO
+}
+
+// =============================================================================
 // TABLAS MAESTRAS E INDEPENDIENTES
 // =============================================================================
 
@@ -30,6 +45,7 @@ model Empresa {
   cierres_mensuales     CierreMensual[]
   pesajes               Pesaje[]
   auditoria             Auditoria[]
+  cuentas_corrientes    CuentaCorriente[]
 
   @@map("empresas")
 }
@@ -46,10 +62,11 @@ model Usuario {
   fecha_creacion DateTime @default(now()) @db.Timestamp(6)
 
   // Relaciones
-  empresa           Empresa         @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  cierres_mensuales CierreMensual[]
-  pesajes           Pesaje[]
-  auditoria         Auditoria[]
+  empresa            Empresa           @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  cierres_mensuales  CierreMensual[]
+  pesajes            Pesaje[]
+  auditoria          Auditoria[]
+  cuentas_corrientes CuentaCorriente[]
 
   @@unique([id_empresa, email], map: "uq_usuario_empresa_email")
   @@map("usuarios")
@@ -100,11 +117,13 @@ model Proveedor {
   telefono         String?  @db.VarChar(20)
   activo           Boolean  @default(true)
   es_anonimo       Boolean  @default(false)
+  saldo_actual     Decimal  @default(0.00) @db.Decimal(10, 2) // <-- NUEVO: Saldo financiero del proveedor
   fecha_creacion   DateTime @default(now()) @db.Timestamp(6)
 
   // Relaciones
-  empresa Empresa  @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  pesajes Pesaje[]
+  empresa            Empresa           @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  pesajes            Pesaje[]
+  cuentas_corrientes CuentaCorriente[]
 
   @@unique([id_empresa, numero_documento], map: "uq_proveedor_empresa_doc")
   @@map("proveedores")
@@ -151,33 +170,6 @@ model CierreMensual {
   @@map("cierres_mensuales")
 }
 
-// =============================================================================
-// MÓDULO DE AUDITORÍA (TRAIL)
-// =============================================================================
-
-enum AccionAuditoria {
-  CREAR
-  ACTUALIZAR
-  ELIMINAR
-}
-
-model Auditoria {
-  id_auditoria         String           @id @default(uuid()) @db.Uuid
-  id_empresa           String           @db.Uuid
-  id_usuario           String           @db.Uuid
-  entidad              String           @db.VarChar(100)
-  accion               AccionAuditoria
-  id_registro_afectado String           @db.Uuid
-  valores_anteriores   Json?            @db.Json
-  valores_nuevos       Json?            @db.Json
-  fecha_creacion       DateTime         @default(now()) @db.Timestamp(6)
-
-  empresa Empresa @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
-
-  @@map("auditoria")
-}
-
 model Pesaje {
   id_pesaje       String   @id @default(uuid()) @db.Uuid
   id_empresa      String   @db.Uuid
@@ -188,17 +180,64 @@ model Pesaje {
   tipo_movimiento String   @db.VarChar(20)
   peso_kg         Decimal  @default(0.00) @db.Decimal(10, 2)
   precio_unitario Decimal  @default(0.00) @db.Decimal(10, 2)
-  total_pagado    Decimal  @default(0.00) @db.Decimal(10, 2)
+  valor_total     Decimal  @default(0.00) @db.Decimal(10, 2) // <-- NUEVO: Costo real del material (peso_kg * precio_unitario)
+  total_pagado    Decimal  @default(0.00) @db.Decimal(10, 2) // Dinero físico entregado al proveedor
   observaciones   String?  @db.Text
   estado          String   @default("Completado") @db.VarChar(20)
   fecha_creacion  DateTime @default(now()) @db.Timestamp(6)
 
   // Relaciones
-  empresa   Empresa        @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
-  usuario   Usuario        @relation(fields: [id_usuario], references: [id_usuario])
-  material  Material       @relation(fields: [id_material], references: [id_material])
-  proveedor Proveedor      @relation(fields: [id_proveedor], references: [id_provider])
-  cierre    CierreMensual? @relation(fields: [id_cierre], references: [id_cierre], onDelete: SetNull)
+  empresa            Empresa           @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  usuario            Usuario           @relation(fields: [id_usuario], references: [id_usuario])
+  material           Material          @relation(fields: [id_material], references: [id_material])
+  proveedor          Proveedor         @relation(fields: [id_proveedor], references: [id_provider])
+  cierre             CierreMensual?    @relation(fields: [id_cierre], references: [id_cierre], onDelete: SetNull)
+  cuentas_corrientes CuentaCorriente[] // Relación al libro mayor
 
   @@map("pesajes")
+}
+
+// =============================================================================
+// MÓDULO FINANCIERO (ESTADO DE CUENTA) <-- NUEVO
+// =============================================================================
+
+model CuentaCorriente {
+  id_movimiento   String                   @id @default(uuid()) @db.Uuid
+  id_empresa      String                   @db.Uuid
+  id_proveedor    String                   @db.Uuid
+  id_usuario      String                   @db.Uuid
+  id_pesaje       String?                  @db.Uuid // Nullable, porque puede haber pagos sueltos o adelantos
+  tipo_movimiento TipoMovimientoFinanciero
+  monto           Decimal                  @db.Decimal(10, 2)
+  concepto        String                   @db.VarChar(255)
+  fecha_creacion  DateTime                 @default(now()) @db.Timestamp(6)
+
+  // Relaciones
+  empresa   Empresa   @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  proveedor Proveedor @relation(fields: [id_proveedor], references: [id_provider], onDelete: Cascade)
+  usuario   Usuario   @relation(fields: [id_usuario], references: [id_usuario])
+  pesaje    Pesaje?   @relation(fields: [id_pesaje], references: [id_pesaje], onDelete: SetNull)
+
+  @@map("cuentas_corrientes")
+}
+
+// =============================================================================
+// MÓDULO DE AUDITORÍA (TRAIL)
+// =============================================================================
+
+model Auditoria {
+  id_auditoria         String          @id @default(uuid()) @db.Uuid
+  id_empresa           String          @db.Uuid
+  id_usuario           String          @db.Uuid
+  entidad              String          @db.VarChar(100)
+  accion               AccionAuditoria
+  id_registro_afectado String          @db.Uuid
+  valores_anteriores   Json?           @db.Json
+  valores_nuevos       Json?           @db.Json
+  fecha_creacion       DateTime        @default(now()) @db.Timestamp(6)
+
+  empresa Empresa @relation(fields: [id_empresa], references: [id_empresa], onDelete: Cascade)
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@map("auditoria")
 }
