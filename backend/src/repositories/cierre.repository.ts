@@ -1,7 +1,6 @@
 import prisma from '../config/prisma';
 
 export class CierreRepository {
-  // 1. Historial de todos los cierres mensuales de la empresa
   async findAllByEmpresa(id_empresa: string) {
     return await prisma.cierreMensual.findMany({
       where: { id_empresa },
@@ -15,7 +14,6 @@ export class CierreRepository {
     });
   }
 
-  // 2. Buscar si ya existe un cierre para un mes y año específico
   async findByPeriodo(id_empresa: string, mes: number, anio: number) {
     return await prisma.cierreMensual.findFirst({
       where: {
@@ -26,14 +24,12 @@ export class CierreRepository {
     });
   }
 
-  // 3. Crear el registro del cierre (Guardar la "foto" financiera del mes)
   async create(data: any) {
     return await prisma.cierreMensual.create({
       data
     });
   }
 
-  // 4. Obtener todos los pesajes completados en un rango de fechas
   async findPesajesByPeriodo(id_empresa: string, fechaInicio: Date, fechaFin: Date) {
     return await prisma.pesaje.findMany({
       where: {
